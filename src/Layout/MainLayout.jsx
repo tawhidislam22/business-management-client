@@ -1,9 +1,14 @@
+import { Outlet } from "react-router-dom";
+import Navbar from "../Shered/Navbar/Navbar";
+import Footer from "../Shered/Footer/Footer";
 
 
 const MainLayout = () => {
     return (
-        <div>
-            <h2>This is mainLayout</h2>
+        <div className="max-w-6xl mx-auto">
+            <Navbar></Navbar>
+            <Outlet></Outlet>
+            <Footer></Footer>
         </div>
     );
 };
