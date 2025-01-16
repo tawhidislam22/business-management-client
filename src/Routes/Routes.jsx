@@ -7,6 +7,8 @@ import LogIn from "../Pages/LogIn/LogIn";
 import Home from "../Pages/Home/Home";
 import JoinAsEmployee from "../Pages/Register/JoinAsEmployee";
 import JoinAsHRManager from "../Pages/Register/JoinAsHRManager";
+import MyAssets from "../Pages/MyAssets/MyAssets";
+import RequestAssetPage from "../Pages/RequestForAsset/RequestAssetPage";
 
 
 export  const router = createBrowserRouter([
@@ -17,6 +19,14 @@ export  const router = createBrowserRouter([
         {
           path:"/",
           element:<Home></Home>
+        },
+        {
+          path:'/myAssets',
+          element:<MyAssets></MyAssets>
+        },
+        {
+          path:'/requestForAsset',
+          element:<RequestAssetPage></RequestAssetPage>
         }
       ]
     },
@@ -32,6 +42,7 @@ export  const router = createBrowserRouter([
       path:'/joinAsHr',
       element:<JoinAsHRManager></JoinAsHRManager>
     }
+
 
   ]);
 

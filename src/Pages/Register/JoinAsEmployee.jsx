@@ -1,14 +1,23 @@
 import { useForm } from "react-hook-form";
+import useAuth from "../../Hooks/useAuth";
 
 
 const JoinAsEmployee = () => {
+    const {createUser}=useAuth()
     const {
         register,
         formState: { errors },
         handleSubmit,
     } = useForm()
     const onSubmit = (data) => {
-
+        console.log(data)
+            createUser(data.email,data.password)
+            .then(res=>{
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err.message)
+            })
     }
     return (
         <div className="hero bg-base-200 min-h-screen max-w-6xl mx-auto">

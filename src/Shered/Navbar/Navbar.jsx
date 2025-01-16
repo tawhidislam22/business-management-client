@@ -1,12 +1,32 @@
 import { NavLink } from "react-router-dom";
+import useAuth from "../../Hooks/useAuth";
+import Swal from "sweetalert2";
 
 
 const Navbar = () => {
+    const {user,logOut}=useAuth()
+    const handleSignOut=()=>{
+        logOut()
+        .then(res=>{
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Your work has been saved",
+                showConfirmButton: false,
+                timer: 1500
+              });
+        })
+        .catch(err=>{
+            console.log(err.message)
+        })
+    }
     const navLinks = <>
         <NavLink className="mr-4" to={'/'}><li>Home</li></NavLink>
         <NavLink className="mr-4" to={"/login"}><li>Login</li></NavLink>
         <NavLink className="mr-4" to={"/joinAsEmployee"}><li>Join as Employee</li></NavLink>
         <NavLink className="mr-4" to={"/joinAsHr"}><li>Join as HR Manager</li></NavLink>
+        <NavLink className="mr-4" to={"/myAssets"}><li>My Assets</li></NavLink>
+        <NavLink className="mr-4" to={"/requestForAsset"}><li>Request for an Asset</li></NavLink>
     </>
     return (
         <div className="navbar bg-base-100">
@@ -44,7 +64,7 @@ const Navbar = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                <a className="btn">Button</a>
+                <button onClick={handleSignOut}>SignOut</button>
             </div>
         </div>
     );
