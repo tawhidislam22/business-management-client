@@ -27,6 +27,8 @@ const Navbar = () => {
         <NavLink className="mr-4" to={"/joinAsHr"}><li>Join as HR Manager</li></NavLink>
         <NavLink className="mr-4" to={"/myAssets"}><li>My Assets</li></NavLink>
         <NavLink className="mr-4" to={"/requestForAsset"}><li>Request for an Asset</li></NavLink>
+        <NavLink className="mr-4" to={"/myTeam"}><li>My Team</li></NavLink>
+        <NavLink className="mr-4" to={"/assetList"}><li>Asset List</li></NavLink>
         <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
     </>
     return (

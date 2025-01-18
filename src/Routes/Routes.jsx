@@ -10,6 +10,8 @@ import JoinAsHRManager from "../Pages/Register/JoinAsHRManager";
 import MyAssets from "../Pages/MyAssets/MyAssets";
 import RequestAssetPage from "../Pages/RequestForAsset/RequestAssetPage";
 import Profile from "../Pages/Profile/Profile";
+import MyTeamPage from "../Pages/MyTeam/MyTeam";
+import AssetList from "../Pages/AssetList/AssetList";
 
 
 export  const router = createBrowserRouter([
@@ -30,8 +32,16 @@ export  const router = createBrowserRouter([
           element:<RequestAssetPage></RequestAssetPage>
         },
         {
-          path:'profile',
+          path:'/profile',
           element:<Profile></Profile>
+        },
+        {
+          path:'/myTeam',
+          element:<MyTeamPage></MyTeamPage>
+        },
+        {
+          path:'/assetList',
+          element:<AssetList></AssetList>
         }
       ]
     },
