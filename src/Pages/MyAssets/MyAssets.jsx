@@ -9,7 +9,7 @@ import useAuth from "../../Hooks/useAuth";
 
 const MyAssets = () => {
   // States for search and filters
-  const {user}=useAuth()
+  const { user } = useAuth()
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
@@ -28,33 +28,45 @@ const MyAssets = () => {
 
   const handleCancelRequest = async (assetId) => {
     try {
-      const response = await fetch(`http://localhost:5000/myAssets/${user.email}/${assetId}`, {
-        method: "PUT",
-      });
+      const response = await fetch(
+        `http://localhost:5000/myAssets/${user.email}/${assetId}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (response.ok) {
-        //toast.success("Request canceled successfully!");
+        // Optionally update UI or refetch data after cancellation
+        alert("Request canceled successfully!"); // Replace with toast if needed
       } else {
-        //toast.error("Failed to cancel the request.");
+        alert("Failed to cancel the request."); // Replace with toast if needed
       }
     } catch (error) {
-      //toast.error("An error occurred while canceling the request.");
+      alert("An error occurred while canceling the request."); // Replace with toast if needed
     }
   };
 
+
   const handleReturnAsset = async (assetId) => {
     try {
-      const response = await fetch(`http://localhost:5000/myAssets/${user.email}/${assetId}`, {
-        method: "PUT",
-      });
+      const response = await fetch(
+        `http://localhost:5000/myAssets/${user.email}/${assetId}/return`,
+        {
+          method: "PUT",
+        }
+      );
+
       if (response.ok) {
-        //toast.success("Asset returned successfully!");
+        alert("Asset returned successfully!"); // Replace with toast if desired
+        // Optionally, refetch data to update the UI
       } else {
-        //toast.error("Failed to return the asset.");
+        const errorData = await response.json();
+        alert(errorData.message || "Failed to return the asset."); // Replace with toast
       }
     } catch (error) {
-      //toast.error("An error occurred while returning the asset.");
+      alert("An error occurred while returning the asset."); // Replace with toast
     }
   };
+
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading assets!</div>;
@@ -87,8 +99,8 @@ const MyAssets = () => {
           className="p-2 border border-gray-300 rounded-md w-full md:w-1/4"
         >
           <option value="all">All Types</option>
-          <option value="returnable">Returnable</option>
-          <option value="non-returnable">Non-returnable</option>
+          <option value="Returnable">Returnable</option>
+          <option value="Non-returnable">Non-returnable</option>
         </select>
       </div>
 
@@ -126,6 +138,7 @@ const MyAssets = () => {
                       Cancel
                     </button>
                   )}
+
                   {asset.status === "approved" && (
                     <>
                       <PDFDownloadLink
@@ -136,7 +149,7 @@ const MyAssets = () => {
                           Print
                         </button>
                       </PDFDownloadLink>
-                      {asset.type === "returnable" && (
+                      {asset.type === "Returnable" && (
                         <button
                           onClick={() => handleReturnAsset(asset._id)}
                           className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
