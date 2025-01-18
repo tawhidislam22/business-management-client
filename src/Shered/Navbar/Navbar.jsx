@@ -27,6 +27,7 @@ const Navbar = () => {
         <NavLink className="mr-4" to={"/joinAsHr"}><li>Join as HR Manager</li></NavLink>
         <NavLink className="mr-4" to={"/myAssets"}><li>My Assets</li></NavLink>
         <NavLink className="mr-4" to={"/requestForAsset"}><li>Request for an Asset</li></NavLink>
+        <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
     </>
     return (
         <div className="navbar bg-base-100">

@@ -2,22 +2,24 @@
 
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+//import toast from "react-hot-toast";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import AssetDetailsPDF from "./AssetDetailsPDF";
+import useAuth from "../../Hooks/useAuth";
 
 const MyAssets = () => {
   // States for search and filters
+  const {user}=useAuth()
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
 
   // Fetch assets data using React Query
-  const { data: assets, isLoading, isError } = useQuery({
+  const { data: myAssets, isLoading, isError } = useQuery({
     queryKey: ["myAssets", search, filterStatus, filterType],
     queryFn: async () => {
       const response = await fetch(
-        `http://localhost:5000/assets?search=${search}&status=${filterStatus}&type=${filterType}`
+        `http://localhost:5000/myAssets/${user.email}?search=${search}&status=${filterStatus}&type=${filterType}`
       );
       if (!response.ok) throw new Error("Failed to fetch assets");
       return response.json();
@@ -26,31 +28,31 @@ const MyAssets = () => {
 
   const handleCancelRequest = async (assetId) => {
     try {
-      const response = await fetch(`http://localhost:5000/assets/${assetId}`, {
+      const response = await fetch(`http://localhost:5000/myAssets/${user.email}/${assetId}`, {
         method: "PUT",
       });
       if (response.ok) {
-        toast.success("Request canceled successfully!");
+        //toast.success("Request canceled successfully!");
       } else {
-        toast.error("Failed to cancel the request.");
+        //toast.error("Failed to cancel the request.");
       }
     } catch (error) {
-      toast.error("An error occurred while canceling the request.");
+      //toast.error("An error occurred while canceling the request.");
     }
   };
 
   const handleReturnAsset = async (assetId) => {
     try {
-      const response = await fetch(`http://localhost:5000/assets/${assetId}`, {
+      const response = await fetch(`http://localhost:5000/myAssets/${user.email}/${assetId}`, {
         method: "PUT",
       });
       if (response.ok) {
-        toast.success("Asset returned successfully!");
+        //toast.success("Asset returned successfully!");
       } else {
-        toast.error("Failed to return the asset.");
+        //toast.error("Failed to return the asset.");
       }
     } catch (error) {
-      toast.error("An error occurred while returning the asset.");
+      //toast.error("An error occurred while returning the asset.");
     }
   };
 
@@ -104,7 +106,7 @@ const MyAssets = () => {
             </tr>
           </thead>
           <tbody>
-            {assets.map((asset) => (
+            {myAssets.map((asset) => (
               <tr key={asset.id} className="border-t">
                 <td className="p-3">{asset.name}</td>
                 <td className="p-3 capitalize">{asset.type}</td>
@@ -118,7 +120,7 @@ const MyAssets = () => {
                 <td className="p-3 flex gap-2">
                   {asset.status === "pending" && (
                     <button
-                      onClick={() => handleCancelRequest(asset.id)}
+                      onClick={() => handleCancelRequest(asset._id)}
                       className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
                     >
                       Cancel
@@ -136,7 +138,7 @@ const MyAssets = () => {
                       </PDFDownloadLink>
                       {asset.type === "returnable" && (
                         <button
-                          onClick={() => handleReturnAsset(asset.id)}
+                          onClick={() => handleReturnAsset(asset._id)}
                           className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
                         >
                           Return

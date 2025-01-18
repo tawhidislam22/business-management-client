@@ -9,6 +9,7 @@ import JoinAsEmployee from "../Pages/Register/JoinAsEmployee";
 import JoinAsHRManager from "../Pages/Register/JoinAsHRManager";
 import MyAssets from "../Pages/MyAssets/MyAssets";
 import RequestAssetPage from "../Pages/RequestForAsset/RequestAssetPage";
+import Profile from "../Pages/Profile/Profile";
 
 
 export  const router = createBrowserRouter([
@@ -27,6 +28,10 @@ export  const router = createBrowserRouter([
         {
           path:'/requestForAsset',
           element:<RequestAssetPage></RequestAssetPage>
+        },
+        {
+          path:'profile',
+          element:<Profile></Profile>
         }
       ]
     },
