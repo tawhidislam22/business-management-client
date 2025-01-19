@@ -33,20 +33,23 @@ const RequestAssetPage = () => {
       return;
     }
 
+    const additionalNote = prompt("Add an additional note for this request (optional):");
+
     const requestData = {
-      userEmail: user.email,
-      name: asset.name,
-      type: asset.type,
-      requestDate: new Date(),
-      status: "pending",
-      availability: false,
+      name: asset.name, // Asset Name
+      type: asset.type, // Asset Type
+      userEmail: user.email, // Email of requester
+      userName: user.displayName || "Anonymous", // Name of requester
+      requestDate: new Date().toISOString(), // Request Date
+      additionalNote: additionalNote || "", // Additional Note
+      status: "pending", // Initial Status
     };
 
     try {
-      const response = await axios.post(`http://localhost:5000/myAssets`, requestData);
+      const response = await axios.post(`http://localhost:5000/allRequests`, requestData);
       if (response.status === 201) {
-        console.log(response.data)
-        //toast.success("Asset request submitted successfully!");
+        toast.success("Asset request submitted successfully!");
+        console.log("Response:", response.data);
         // Optionally, update the UI or reload the assets list
       }
     } catch (error) {
@@ -54,6 +57,7 @@ const RequestAssetPage = () => {
       console.error(error);
     }
   };
+
 
   if (loading) {
     return (
@@ -125,11 +129,10 @@ const RequestAssetPage = () => {
             <button
               key={index}
               onClick={() => setPage(index + 1)}
-              className={`px-4 py-2 text-lg font-medium rounded-full transition duration-300 ${
-                page === index + 1
+              className={`px-4 py-2 text-lg font-medium rounded-full transition duration-300 ${page === index + 1
                   ? "bg-purple-500 text-gray-900 dark:bg-purple-500 dark:text-gray-900 shadow-lg"
                   : "bg-gray-800 text-gray-300 dark:bg-gray-700 dark:text-gray-400 hover:bg-gray-700 dark:hover:bg-gray-600"
-              }`}
+                }`}
             >
               {index + 1}
             </button>

@@ -30,6 +30,7 @@ const Navbar = () => {
         <NavLink className="mr-4" to={"/myTeam"}><li>My Team</li></NavLink>
         <NavLink className="mr-4" to={"/assetList"}><li>Asset List</li></NavLink>
         <NavLink className="mr-4" to={"/addAnAsset"}><li>Add An Asset</li></NavLink>
+        <NavLink className="mr-4" to={"/allRequests"}><li>All Requests</li></NavLink>
         <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
     </>
     return (

@@ -19,7 +19,7 @@ const MyAssets = () => {
     queryKey: ["myAssets", search, filterStatus, filterType],
     queryFn: async () => {
       const response = await fetch(
-        `http://localhost:5000/myAssets/${user.email}?search=${search}&status=${filterStatus}&type=${filterType}`
+        `http://localhost:5000/allRequests/${user.email}?search=${search}&status=${filterStatus}&type=${filterType}`
       );
       if (!response.ok) throw new Error("Failed to fetch assets");
       return response.json();
@@ -29,7 +29,7 @@ const MyAssets = () => {
   const handleCancelRequest = async (assetId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/myAssets/${user.email}/${assetId}`,
+        `http://localhost:5000/allRequests/${user.email}/${assetId}`,
         {
           method: "DELETE",
         }
@@ -49,7 +49,7 @@ const MyAssets = () => {
   const handleReturnAsset = async (assetId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/myAssets/${user.email}/${assetId}/return`,
+        `http://localhost:5000/allRequests/${user.email}/${assetId}/return`,
         {
           method: "PUT",
         }

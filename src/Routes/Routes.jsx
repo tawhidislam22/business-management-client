@@ -13,6 +13,7 @@ import Profile from "../Pages/Profile/Profile";
 import MyTeamPage from "../Pages/MyTeam/MyTeam";
 import AssetList from "../Pages/AssetList/AssetList";
 import AddAnAsset from "../Pages/AddAnAsset/AddAnAsset";
+import AllRequests from "../Pages/AllRequests/AllRequests";
 
 
 export  const router = createBrowserRouter([
@@ -47,6 +48,10 @@ export  const router = createBrowserRouter([
         {
           path:'/addAnAsset',
           element:<AddAnAsset></AddAnAsset>
+        },
+        {
+          path:'/allRequests',
+          element:<AllRequests></AllRequests>
         }
       ]
     },
