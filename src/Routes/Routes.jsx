@@ -14,7 +14,7 @@ import MyTeamPage from "../Pages/MyTeam/MyTeam";
 import AssetList from "../Pages/AssetList/AssetList";
 import AddAnAsset from "../Pages/AddAnAsset/AddAnAsset";
 import AllRequests from "../Pages/AllRequests/AllRequests";
-
+import MyEmployeeList from "../Pages/MyEmployeeList/MyEmployeeList"
 
 export  const router = createBrowserRouter([
     {
@@ -52,6 +52,10 @@ export  const router = createBrowserRouter([
         {
           path:'/allRequests',
           element:<AllRequests></AllRequests>
+        },
+        {
+          path:'/myEmployeeList',
+          element:<MyEmployeeList></MyEmployeeList>
         }
       ]
     },
