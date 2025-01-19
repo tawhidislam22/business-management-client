@@ -16,6 +16,7 @@ import AddAnAsset from "../Pages/AddAnAsset/AddAnAsset";
 import AllRequests from "../Pages/AllRequests/AllRequests";
 import MyEmployeeList from "../Pages/MyEmployeeList/MyEmployeeList"
 import AddAnEmployee from "../Pages/AddAnEmployee/AddAnEmployee";
+import PrivateRoute from "./PrivateRoute";
 
 export  const router = createBrowserRouter([
     {
@@ -28,39 +29,39 @@ export  const router = createBrowserRouter([
         },
         {
           path:'/myAssets',
-          element:<MyAssets></MyAssets>
+          element:<PrivateRoute><MyAssets></MyAssets></PrivateRoute>
         },
         {
           path:'/requestForAsset',
-          element:<RequestAssetPage></RequestAssetPage>
+          element:<PrivateRoute><RequestAssetPage></RequestAssetPage></PrivateRoute>
         },
         {
           path:'/profile',
-          element:<Profile></Profile>
+          element:<PrivateRoute><Profile></Profile></PrivateRoute>
         },
         {
           path:'/myTeam',
-          element:<MyTeamPage></MyTeamPage>
+          element:<PrivateRoute><MyTeamPage></MyTeamPage></PrivateRoute>
         },
         {
           path:'/assetList',
-          element:<AssetList></AssetList>
+          element:<PrivateRoute><AssetList></AssetList></PrivateRoute>
         },
         {
           path:'/addAnAsset',
-          element:<AddAnAsset></AddAnAsset>
+          element:<PrivateRoute><AddAnAsset></AddAnAsset></PrivateRoute>
         },
         {
           path:'/allRequests',
-          element:<AllRequests></AllRequests>
+          element:<PrivateRoute><AllRequests></AllRequests></PrivateRoute>
         },
         {
           path:'/myEmployeeList',
-          element:<MyEmployeeList></MyEmployeeList>
+          element:<PrivateRoute><MyEmployeeList></MyEmployeeList></PrivateRoute>
         },
         {
           path:'/addAnEmployee',
-          element:<AddAnEmployee></AddAnEmployee>
+          element:<PrivateRoute><AddAnEmployee></AddAnEmployee></PrivateRoute>
         }
       ]
     },

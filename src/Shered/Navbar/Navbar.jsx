@@ -4,36 +4,44 @@ import Swal from "sweetalert2";
 
 
 const Navbar = () => {
-    const {user,logOut}=useAuth()
-    const handleSignOut=()=>{
+    const { user, logOut } = useAuth()
+    const handleSignOut = () => {
         logOut()
-        .then(res=>{
-            Swal.fire({
-                position: "top-end",
-                icon: "success",
-                title: "Your work has been saved",
-                showConfirmButton: false,
-                timer: 1500
-              });
-        })
-        .catch(err=>{
-            console.log(err.message)
-        })
+            .then(res => {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Your work has been saved",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            })
+            .catch(err => {
+                console.log(err.message)
+            })
     }
     const navLinks = <>
         <NavLink className="mr-4" to={'/'}><li>Home</li></NavLink>
-        <NavLink className="mr-4" to={"/login"}><li>Login</li></NavLink>
-        <NavLink className="mr-4" to={"/joinAsEmployee"}><li>Join as Employee</li></NavLink>
-        <NavLink className="mr-4" to={"/joinAsHr"}><li>Join as HR Manager</li></NavLink>
-        <NavLink className="mr-4" to={"/myAssets"}><li>My Assets</li></NavLink>
-        <NavLink className="mr-4" to={"/requestForAsset"}><li>Request for an Asset</li></NavLink>
-        <NavLink className="mr-4" to={"/myTeam"}><li>My Team</li></NavLink>
-        <NavLink className="mr-4" to={"/assetList"}><li>Asset List</li></NavLink>
-        <NavLink className="mr-4" to={"/addAnAsset"}><li>Add An Asset</li></NavLink>
-        <NavLink className="mr-4" to={"/allRequests"}><li>All Requests</li></NavLink>
-        <NavLink className="mr-4" to={"/myEmployeeList"}><li>My Employee List</li></NavLink>
-        <NavLink className="mr-4" to={"/addAnEmployee"}><li>Add an Employee</li></NavLink>
-        <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
+        {
+            !user ? <div className="flex justify-center items-center gap-4">
+                <NavLink className="mr-4" to={"/login"}><li>Login</li></NavLink>
+                <NavLink className="mr-4" to={"/joinAsEmployee"}><li>Join as Employee</li></NavLink>
+                <NavLink className="mr-4" to={"/joinAsHr"}><li>Join as HR Manager</li></NavLink>
+            </div> : <div className="flex justify-center items-center gap-2">
+                <NavLink className="mr-4" to={"/myAssets"}><li>My Assets</li></NavLink>
+                <NavLink className="mr-4" to={"/requestForAsset"}><li>Request for an Asset</li></NavLink>
+                <NavLink className="mr-4" to={"/myTeam"}><li>My Team</li></NavLink>
+                <NavLink className="mr-4" to={"/assetList"}><li>Asset List</li></NavLink>
+                <NavLink className="mr-4" to={"/addAnAsset"}><li>Add An Asset</li></NavLink>
+                <NavLink className="mr-4" to={"/allRequests"}><li>All Requests</li></NavLink>
+                <NavLink className="mr-4" to={"/myEmployeeList"}><li>My Employee List</li></NavLink>
+                <NavLink className="mr-4" to={"/addAnEmployee"}><li>Add an Employee</li></NavLink>
+                <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
+            </div>
+        }
+
+
+
     </>
     return (
         <div className="navbar bg-base-100">
@@ -56,9 +64,9 @@ const Navbar = () => {
                     <ul
                         tabIndex={0}
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                            {
-                                navLinks
-                            }
+                        {
+                            navLinks
+                        }
                     </ul>
                 </div>
                 <a className="btn btn-ghost text-xl">daisyUI</a>
