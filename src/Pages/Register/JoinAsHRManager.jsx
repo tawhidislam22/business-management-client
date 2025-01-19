@@ -1,7 +1,13 @@
 import { useForm } from "react-hook-form";
+import useAuth from "../../Hooks/useAuth";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useNavigate } from "react-router-dom";
 
 
 const JoinAsHRManager = () => {
+    const {createUser}=useAuth()
+    const axiosPublic=useAxiosPublic()
+    const navigate=useNavigate()
     const {
         register,
         handleSubmit,
@@ -10,7 +16,21 @@ const JoinAsHRManager = () => {
     
       const onSubmit = (data) => {
         console.log(data);
-        
+        createUser(data.email,data.password)
+            .then(res=>{
+                console.log(res)
+                const userInfo = {
+                    name: data.name,
+                    email: data.email,
+                    admin:true,
+                    role:'hr'
+                };
+                return axiosPublic.post('/users', userInfo);
+                navigate('/')
+            })
+            .catch(err=>{
+                console.log(err.message)
+            })
       };
     return (
         <div>

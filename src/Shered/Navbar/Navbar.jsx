@@ -1,10 +1,12 @@
 import { NavLink } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
+import useHr from "../../Hooks/useHr";
 
 
 const Navbar = () => {
     const { user, logOut } = useAuth()
+    const [isHr, isHrLoading] = useHr()
     const handleSignOut = () => {
         logOut()
             .then(res => {
@@ -27,16 +29,25 @@ const Navbar = () => {
                 <NavLink className="mr-4" to={"/login"}><li>Login</li></NavLink>
                 <NavLink className="mr-4" to={"/joinAsEmployee"}><li>Join as Employee</li></NavLink>
                 <NavLink className="mr-4" to={"/joinAsHr"}><li>Join as HR Manager</li></NavLink>
-            </div> : <div className="flex justify-center items-center gap-2">
-                <NavLink className="mr-4" to={"/myAssets"}><li>My Assets</li></NavLink>
-                <NavLink className="mr-4" to={"/requestForAsset"}><li>Request for an Asset</li></NavLink>
-                <NavLink className="mr-4" to={"/myTeam"}><li>My Team</li></NavLink>
-                <NavLink className="mr-4" to={"/assetList"}><li>Asset List</li></NavLink>
-                <NavLink className="mr-4" to={"/addAnAsset"}><li>Add An Asset</li></NavLink>
-                <NavLink className="mr-4" to={"/allRequests"}><li>All Requests</li></NavLink>
-                <NavLink className="mr-4" to={"/myEmployeeList"}><li>My Employee List</li></NavLink>
-                <NavLink className="mr-4" to={"/addAnEmployee"}><li>Add an Employee</li></NavLink>
-                <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
+            </div> : <div >
+                {
+                    isHr ? <div className="flex justify-center items-center gap-2">
+                        <NavLink className="mr-4" to={"/myAssets"}><li>My Assets</li></NavLink>
+                        <NavLink className="mr-4" to={"/requestForAsset"}><li>Request for an Asset</li></NavLink>
+                        <NavLink className="mr-4" to={"/myTeam"}><li>My Team</li></NavLink>
+                        <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
+                    </div> : <div className="flex justify-center items-center gap-2">
+                        <NavLink className="mr-4" to={"/assetList"}><li>Asset List</li></NavLink>
+                        <NavLink className="mr-4" to={"/addAnAsset"}><li>Add An Asset</li></NavLink>
+                        <NavLink className="mr-4" to={"/allRequests"}><li>All Requests</li></NavLink>
+                        <NavLink className="mr-4" to={"/myEmployeeList"}><li>My Employee List</li></NavLink>
+                        <NavLink className="mr-4" to={"/addAnEmployee"}><li>Add an Employee</li></NavLink>
+                        <NavLink className="mr-4" to={"/profile"}><li>Profile</li></NavLink>
+                    </div>
+                }
+
+
+                
             </div>
         }
 

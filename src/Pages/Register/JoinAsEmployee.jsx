@@ -1,9 +1,13 @@
 import { useForm } from "react-hook-form";
 import useAuth from "../../Hooks/useAuth";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useNavigate } from "react-router-dom";
 
 
 const JoinAsEmployee = () => {
     const {createUser}=useAuth()
+    const axiosPublic=useAxiosPublic()
+    const navigate=useNavigate()
     const {
         register,
         formState: { errors },
@@ -14,6 +18,14 @@ const JoinAsEmployee = () => {
             createUser(data.email,data.password)
             .then(res=>{
                 console.log(res)
+                const userInfo = {
+                    name: data.name,
+                    email: data.email,
+                    admin:false,
+                    role:'employee'
+                };
+                return axiosPublic.post('/users', userInfo);
+                navigate('/')
             })
             .catch(err=>{
                 console.log(err.message)
