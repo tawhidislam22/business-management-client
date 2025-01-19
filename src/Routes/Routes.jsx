@@ -15,6 +15,7 @@ import AssetList from "../Pages/AssetList/AssetList";
 import AddAnAsset from "../Pages/AddAnAsset/AddAnAsset";
 import AllRequests from "../Pages/AllRequests/AllRequests";
 import MyEmployeeList from "../Pages/MyEmployeeList/MyEmployeeList"
+import AddAnEmployee from "../Pages/AddAnEmployee/AddAnEmployee";
 
 export  const router = createBrowserRouter([
     {
@@ -56,6 +57,10 @@ export  const router = createBrowserRouter([
         {
           path:'/myEmployeeList',
           element:<MyEmployeeList></MyEmployeeList>
+        },
+        {
+          path:'/addAnEmployee',
+          element:<AddAnEmployee></AddAnEmployee>
         }
       ]
     },
