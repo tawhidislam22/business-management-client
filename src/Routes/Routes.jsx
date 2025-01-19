@@ -12,6 +12,7 @@ import RequestAssetPage from "../Pages/RequestForAsset/RequestAssetPage";
 import Profile from "../Pages/Profile/Profile";
 import MyTeamPage from "../Pages/MyTeam/MyTeam";
 import AssetList from "../Pages/AssetList/AssetList";
+import AddAnAsset from "../Pages/AddAnAsset/AddAnAsset";
 
 
 export  const router = createBrowserRouter([
@@ -42,6 +43,10 @@ export  const router = createBrowserRouter([
         {
           path:'/assetList',
           element:<AssetList></AssetList>
+        },
+        {
+          path:'/addAnAsset',
+          element:<AddAnAsset></AddAnAsset>
         }
       ]
     },
