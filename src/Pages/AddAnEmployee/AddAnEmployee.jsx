@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import axios from "axios";
 
@@ -14,16 +13,30 @@ const AddAnEmployee = ({ onEmployeeAdded }) => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imagePreview, setImagePreview] = useState(null); // State for image preview
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const newFormData = { ...prev, [name]: value };
+      if (name === "image") {
+        setImagePreview(value); // Update image preview when image URL changes
+      }
+      return newFormData;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.department || !formData.dob || !formData.image) {
+      setError("All fields are required.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post("http://localhost:5000/employees", formData);
@@ -37,6 +50,7 @@ const AddAnEmployee = ({ onEmployeeAdded }) => {
         dob: "",
         image: "",
       });
+      setImagePreview(null); // Reset image preview
     } catch (err) {
       console.error("Error adding employee:", err);
       setError("Failed to add employee. Please try again.");
@@ -107,6 +121,19 @@ const AddAnEmployee = ({ onEmployeeAdded }) => {
             required
           />
         </div>
+        
+        {/* Image preview */}
+        {imagePreview && (
+          <div>
+            <label>Image Preview:</label>
+            <img
+              src={imagePreview}
+              alt="Image Preview"
+              style={{ maxWidth: "150px", maxHeight: "150px" }}
+            />
+          </div>
+        )}
+
         <button type="submit" disabled={loading}>
           {loading ? "Adding..." : "Add Employee"}
         </button>
