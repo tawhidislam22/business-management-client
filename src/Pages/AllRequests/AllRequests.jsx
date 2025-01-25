@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import useDebounce from "./useDebounce"; // Import the custom debounce hook
 
 const AllRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -9,12 +9,14 @@ const AllRequests = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const debouncedSearch = useDebounce(search, 500); // Debounce the search term by 500ms
+
   // Fetch all requests
   const fetchRequests = async () => {
     setLoading(true);
     try {
       const response = await axios.get("http://localhost:5000/allRequests", {
-        params: { search, status, email },
+        params: { search: debouncedSearch, status, email },
       });
       setRequests(response.data);
     } catch (error) {
@@ -27,7 +29,7 @@ const AllRequests = () => {
   // Fetch requests on mount and when filters change
   useEffect(() => {
     fetchRequests();
-  }, [search, status, email]);
+  }, [debouncedSearch, status, email]);
 
   // Approve or Reject Request
   const handleApprove = async (requestId) => {

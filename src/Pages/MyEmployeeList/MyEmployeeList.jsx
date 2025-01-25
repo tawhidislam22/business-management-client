@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import useDebounce from "./useDebounce"; // Import the custom debounce hook
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
@@ -8,12 +9,14 @@ const EmployeeList = () => {
   const [department, setDepartment] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const debouncedSearch = useDebounce(search, 500); // Debounce the search term by 500ms
+
   // Fetch all employees
   const fetchEmployees = async () => {
     setLoading(true);
     try {
       const response = await axios.get("http://localhost:5000/employees", {
-        params: { search, status, department },
+        params: { search: debouncedSearch, status, department },
       });
       setEmployees(response.data);
     } catch (error) {
@@ -26,7 +29,7 @@ const EmployeeList = () => {
   // Fetch employees on mount and when filters change
   useEffect(() => {
     fetchEmployees();
-  }, [search, status, department]);
+  }, [debouncedSearch, status, department]);
 
   // Handle Employee actions (View, Edit, Delete)
   const handleView = (id) => {
@@ -40,11 +43,15 @@ const EmployeeList = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/employees/${id}`);
-      fetchEmployees(); // Reload the list after deleting
-    } catch (error) {
-      console.error("Error deleting employee:", error.message);
+    // Add a confirmation dialog before deletion
+    const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
+    if (confirmDelete) {
+      try {
+        await axios.delete(`http://localhost:5000/employees/${id}`);
+        fetchEmployees(); // Reload the list after deleting
+      } catch (error) {
+        console.error("Error deleting employee:", error.message);
+      }
     }
   };
 
@@ -83,7 +90,8 @@ const EmployeeList = () => {
         </select>
         <button
           onClick={fetchEmployees}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          disabled={loading}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
           Filter
         </button>
