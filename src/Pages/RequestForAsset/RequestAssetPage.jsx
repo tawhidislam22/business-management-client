@@ -36,8 +36,10 @@ const RequestAssetPage = () => {
     const additionalNote = prompt("Add an additional note for this request (optional):");
 
     const requestData = {
+      assetId:asset._id,
       name: asset.name, // Asset Name
       type: asset.type, // Asset Type
+      quantity:asset.quantity,
       userEmail: user.email, // Email of requester
       userName: user.displayName || "Anonymous", // Name of requester
       requestDate: new Date().toISOString(), // Request Date

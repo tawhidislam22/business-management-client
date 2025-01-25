@@ -1,18 +1,24 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import useAdmin from "../Hooks/useAdmin";
 import useAuth from "../Hooks/useAuth";
 
+const HrRoute = ({ children }) => {
+    const [isHr, isHrLoading] = useAdmin();
+    const { user, loading } = useAuth();
+    const location = useLocation();
 
-const HrRoute = ({children}) => {
-    const [isHr,isHrLoading]=useAdmin()
-    const {user,loading}=useAuth()
-    if(loading || isHrLoading){
+    // Handle loading states
+    if (loading || isHrLoading) {
         return <span className="loading loading-ring loading-lg"></span>;
     }
-    if(user && isHr){
-        return children
+
+    // Handle authorization
+    if (user && isHr) {
+        return children;
     }
-    return <Navigate to="/login" state={{from:location}} replace></Navigate>;
+
+    // Redirect to login if unauthorized
+    return <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 export default HrRoute;
