@@ -1,15 +1,12 @@
-
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-//import toast from "react-hot-toast";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import AssetDetailsPDF from "./AssetDetailsPDF";
 import useAuth from "../../Hooks/useAuth";
+import toast from "react-hot-toast"; // Import toast
 
 const MyAssets = () => {
-  // States for search and filters
-  const { user } = useAuth()
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
@@ -35,16 +32,14 @@ const MyAssets = () => {
         }
       );
       if (response.ok) {
-        // Optionally update UI or refetch data after cancellation
-        alert("Request canceled successfully!"); // Replace with toast if needed
+        toast.success("Request canceled successfully!"); // Using toast notification
       } else {
-        alert("Failed to cancel the request."); // Replace with toast if needed
+        toast.error("Failed to cancel the request."); // Using toast notification
       }
     } catch (error) {
-      alert("An error occurred while canceling the request."); // Replace with toast if needed
+      toast.error("An error occurred while canceling the request."); // Using toast notification
     }
   };
-
 
   const handleReturnAsset = async (assetId) => {
     try {
@@ -56,17 +51,15 @@ const MyAssets = () => {
       );
 
       if (response.ok) {
-        alert("Asset returned successfully!"); // Replace with toast if desired
-        // Optionally, refetch data to update the UI
+        toast.success("Asset returned successfully!"); // Using toast notification
       } else {
         const errorData = await response.json();
-        alert(errorData.message || "Failed to return the asset."); // Replace with toast
+        toast.error(errorData.message || "Failed to return the asset."); // Using toast notification
       }
     } catch (error) {
-      alert("An error occurred while returning the asset."); // Replace with toast
+      toast.error("An error occurred while returning the asset."); // Using toast notification
     }
   };
-
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading assets!</div>;
@@ -118,50 +111,58 @@ const MyAssets = () => {
             </tr>
           </thead>
           <tbody>
-            {myAssets.map((asset) => (
-              <tr key={asset.id} className="border-t">
-                <td className="p-3">{asset.name}</td>
-                <td className="p-3 capitalize">{asset.type}</td>
-                <td className="p-3">{new Date(asset.requestDate).toLocaleDateString()}</td>
-                <td className="p-3">
-                  {asset.approvalDate
-                    ? new Date(asset.approvalDate).toLocaleDateString()
-                    : "N/A"}
-                </td>
-                <td className="p-3 capitalize">{asset.status}</td>
-                <td className="p-3 flex gap-2">
-                  {asset.status === "pending" && (
-                    <button
-                      onClick={() => handleCancelRequest(asset._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
-                    >
-                      Cancel
-                    </button>
-                  )}
-
-                  {asset.status === "approved" && (
-                    <>
-                      <PDFDownloadLink
-                        document={<AssetDetailsPDF asset={asset} />}
-                        fileName={`${asset.name}-details.pdf`}
-                      >
-                        <button className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">
-                          Print
-                        </button>
-                      </PDFDownloadLink>
-                      {asset.type === "Returnable" && (
-                        <button
-                          onClick={() => handleReturnAsset(asset._id)}
-                          className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
-                        >
-                          Return
-                        </button>
-                      )}
-                    </>
-                  )}
+            {myAssets.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center p-3">
+                  No assets found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              myAssets.map((asset) => (
+                <tr key={asset.id} className="border-t">
+                  <td className="p-3">{asset.name}</td>
+                  <td className="p-3 capitalize">{asset.type}</td>
+                  <td className="p-3">{new Date(asset.requestDate).toLocaleDateString()}</td>
+                  <td className="p-3">
+                    {asset.approvalDate
+                      ? new Date(asset.approvalDate).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td className="p-3 capitalize">{asset.status}</td>
+                  <td className="p-3 flex gap-2">
+                    {asset.status === "pending" && (
+                      <button
+                        onClick={() => handleCancelRequest(asset._id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                      >
+                        Cancel
+                      </button>
+                    )}
+
+                    {asset.status === "approved" && (
+                      <>
+                        <PDFDownloadLink
+                          document={<AssetDetailsPDF asset={asset} />}
+                          fileName={`${asset.name}-details.pdf`}
+                        >
+                          <button className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">
+                            Print
+                          </button>
+                        </PDFDownloadLink>
+                        {asset.type === "Returnable" && (
+                          <button
+                            onClick={() => handleReturnAsset(asset._id)}
+                            className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
+                          >
+                            Return
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
