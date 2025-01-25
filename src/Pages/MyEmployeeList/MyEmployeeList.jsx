@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import useDebounce from "./useDebounce"; // Import the custom debounce hook
+import useDebounce from "../../Hooks/useDebounce" // Import the custom debounce hook
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
