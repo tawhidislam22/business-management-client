@@ -1,81 +1,235 @@
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
-import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
+import SocialLogin from "../../Coponents/SocialLogin/SocialLogin";
 
 const JoinAsEmployee = () => {
-    const {createUser}=useAuth()
-    const axiosPublic=useAxiosPublic()
-    const navigate=useNavigate()
+    const { createUser, updateUserProfile } = useAuth();
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const axiosPublic = useAxiosPublic();
+    const navigate = useNavigate();
+
     const {
         register,
-        formState: { errors },
         handleSubmit,
-    } = useForm()
-    const onSubmit = (data) => {
-        console.log(data)
-            createUser(data.email,data.password)
-            .then(res=>{
-                console.log(res)
-                const userInfo = {
-                    name: data.name,
-                    email: data.email,
-                    admin:false,
-                    role:'employee'
-                };
-                return axiosPublic.post('/users', userInfo);
-                navigate('/')
-            })
-            .catch(err=>{
-                console.log(err.message)
-            })
-    }
+        formState: { errors },
+        watch,
+        reset
+    } = useForm();
+
+    const password = watch("password");
+
+    const onSubmit = async (data) => {
+        setLoading(true);
+        try {
+            // Upload image to imgbb if provided
+            let photoURL = null;
+            if (data.photo && data.photo[0]) {
+                const imageFile = new FormData();
+                imageFile.append('image', data.photo[0]);
+                const imgbbResponse = await axiosPublic.post(
+                    `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`,
+                    imageFile
+                );
+                photoURL = imgbbResponse.data.data.url;
+            }
+
+            // Create user
+            const result = await createUser(data.email, data.password);
+            
+            // Update profile
+            await updateUserProfile(data.name, photoURL);
+
+            // Save user to database
+            const userInfo = {
+                name: data.name,
+                email: data.email,
+                role: 'employee',
+                photo: photoURL,
+                dateOfJoining: new Date(),
+                department: data.department
+            };
+
+            // Save user info to database
+            const dbResponse = await axiosPublic.post('/users', userInfo);
+
+            if (dbResponse.data.insertedId) {
+                // Get JWT token
+                const response = await axiosPublic.post('/jwt', {
+                    email: result.user.email
+                });
+                
+                if (response.data.token) {
+                    localStorage.setItem('access-token', response.data.token);
+                    toast.success('Registration successful!');
+                    reset();
+                    navigate('/');
+                }
+            }
+        } catch (error) {
+            toast.error(error.message || 'Failed to register');
+            console.error('Registration error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="hero bg-base-200 min-h-screen max-w-6xl mx-auto">
-            <div className="hero-content flex-col lg:flex-row-reverse">
-                <div className="text-center lg:text-left">
-                    <h1 className="text-5xl font-bold">Login now!</h1>
-                    <p className="py-6">
-                        Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-                        quasi. In deleniti eaque aut repudiandae et a id nisi.
+        <div className="min-h-screen bg-base-200 flex items-center justify-center py-8">
+            <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-base-100">
+                <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
+                    <h1 className="text-4xl font-bold text-center mb-4">Join as Employee</h1>
+
+                    {/* Full Name */}
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text">Full Name</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Full Name"
+                            className="input input-bordered"
+                            {...register("name", {
+                                required: "Name is required",
+                                minLength: {
+                                    value: 3,
+                                    message: "Name must be at least 3 characters"
+                                }
+                            })}
+                        />
+                        {errors.name && <span className="text-red-500 text-sm mt-1">{errors.name.message}</span>}
+                    </div>
+
+                    {/* Email */}
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text">Email</span>
+                        </label>
+                        <input
+                            type="email"
+                            placeholder="email"
+                            className="input input-bordered"
+                            {...register("email", {
+                                required: "Email is required",
+                                pattern: {
+                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                    message: "Invalid email address"
+                                }
+                            })}
+                        />
+                        {errors.email && <span className="text-red-500 text-sm mt-1">{errors.email.message}</span>}
+                    </div>
+
+                    {/* Department */}
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text">Department</span>
+                        </label>
+                        <select
+                            className="select select-bordered w-full"
+                            {...register("department", {
+                                required: "Department is required"
+                            })}
+                        >
+                            <option value="">Select Department</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="sales">Sales</option>
+                            <option value="finance">Finance</option>
+                            <option value="hr">Human Resources</option>
+                        </select>
+                        {errors.department && <span className="text-red-500 text-sm mt-1">{errors.department.message}</span>}
+                    </div>
+
+                    {/* Password */}
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text">Password</span>
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="password"
+                                className="input input-bordered w-full"
+                                {...register("password", {
+                                    required: "Password is required",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Password must be at least 6 characters"
+                                    },
+                                    pattern: {
+                                        value: /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z])/,
+                                        message: 'Password must contain at least one uppercase, one lowercase, one number and one special character'
+                                    }
+                                })}
+                            />
+                            <button
+                                type="button"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+                        {errors.password && <span className="text-red-500 text-sm mt-1">{errors.password.message}</span>}
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text">Confirm Password</span>
+                        </label>
+                        <input
+                            type="password"
+                            placeholder="Confirm password"
+                            className="input input-bordered"
+                            {...register("confirmPassword", {
+                                required: "Please confirm your password",
+                                validate: value => value === password || "Passwords do not match"
+                            })}
+                        />
+                        {errors.confirmPassword && <span className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</span>}
+                    </div>
+
+                    {/* Photo Upload */}
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text">Profile Photo</span>
+                        </label>
+                        <input
+                            type="file"
+                            className="file-input file-input-bordered w-full"
+                            accept="image/*"
+                            {...register("photo")}
+                        />
+                    </div>
+
+                    <div className="form-control mt-6">
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            disabled={loading}
+                        >
+                            {loading ? <span className="loading loading-spinner"></span> : "Register"}
+                        </button>
+                    </div>
+
+                    <p className="text-center mt-4">
+                        Already have an account?{" "}
+                        <Link to="/login" className="text-primary hover:underline">
+                            Login here
+                        </Link>
                     </p>
-                </div>
-                <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
-                    <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text">Full Name</span>
-                            </label>
-                            <input {...register("name", { required: true })} type="Text" placeholder="Full Name" className="input input-bordered" required />
-                        </div>
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text">Email</span>
-                            </label>
-                            <input {...register("email", { required: true })} type="email" placeholder="Email" className="input input-bordered" required />
-                        </div>
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text">Password</span>
-                            </label>
-                            <input {...register("password", { required: true })} type="password" placeholder="Password" className="input input-bordered" required />
-                        </div>
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text">Date of Birth</span>
-                            </label>
-                            <input {...register("dateOfBirth", { required: true })} type="date" placeholder="Date of Birth" className="input input-bordered" required />
-                        </div>
 
+                    <div className="divider">OR</div>
 
-                        <div className="form-control mt-6">
-                            <button className="btn btn-primary">Signup</button>
-                        </div>
-
-                        
-                    </form>
-                </div>
+                    <SocialLogin />
+                </form>
             </div>
         </div>
     );

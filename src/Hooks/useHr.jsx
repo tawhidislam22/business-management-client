@@ -1,41 +1,56 @@
 import { useQuery } from "@tanstack/react-query";
 import useAuth from "./useAuth";
 import useAxiosSecure from "./useAxiosSecure";
-import { useNavigate } from "react-router-dom"; // Import react-router-dom for navigation
+import { useNavigate } from "react-router-dom";
 
-const useHr = () => {
-    const { user } = useAuth(); // Get the user object
-    const axiosSecure = useAxiosSecure();
-    const navigate = useNavigate(); // Hook to navigate to login or error pages if needed
+const useHr = (debug = false) => {
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
 
-    const { data: isHr = false, isLoading: isHrLoading, error } = useQuery({
-        queryKey: ['isHr', user?.email], // Simplified queryKey
-        enabled: !!user?.email, // Only run the query if user email exists
-        queryFn: async () => {
-            try {
-                const res = await axiosSecure.get(`/users/hr/${user.email}`);
-                return res.data?.hr;
-            } catch (err) {
-                // Handle error (Unauthorized, network errors, etc.)
-                console.error("Error fetching HR status:", err);
+  const {
+    data: isHr = false,
+    isLoading: isHrLoading,
+    error,
+  } = useQuery({
+    queryKey: ["isHr", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      if (debug) {
+        console.log("Fetching HR status for user:", user?.email);
+      }
 
-                // Handle 401 Unauthorized error
-                if (err.response && err.response.status === 401) {
-                    navigate('/login'); // Redirect to login page if unauthorized
-                }
+      try {
+        const res = await axiosSecure.get(`/users/hr/${user.email}`);
+        if (debug) {
+          console.log("HR status response:", res.data);
+        }
+        return res.data?.hr;
+      } catch (err) {
+        console.error("Error fetching HR status:", err);
+        throw new Error(
+          err.response?.data?.message || "Failed to fetch HR status"
+        );
+      }
+    },
+    onError: (err) => {
+      if (debug) {
+        console.error("Error loading HR data:", err.message);
+      }
 
-                throw new Error("Failed to fetch HR status");
-            }
-        },
-    });
+      // Handle 401 and 403 errors (Unauthorized or Forbidden)
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        localStorage.removeItem("access-token");
+        navigate("/login");
+      }
+    },
+  });
 
-    // Optionally, handle the error state in the UI (like showing a message)
-    if (error) {
-        // You might want to display an error message or notification here
-        console.error("Error loading HR data:", error);
-    }
+  // Combine loading states for HR data and user email availability
+  const isLoading = isHrLoading || !user?.email;
 
-    return [isHr, isHrLoading, error];
+  // Return as an object for better usability
+  return [ isHr, isLoading, error ];
 };
 
 export default useHr;

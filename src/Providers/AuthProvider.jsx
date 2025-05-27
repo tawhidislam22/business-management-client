@@ -1,6 +1,5 @@
 import { useEffect, useState, createContext, useMemo } from "react";
 import {
-  auth,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -10,6 +9,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import useAxiosPublic from "../Hooks/useAxiosPublic";
+import { auth } from "../Firebase/Firebase.config";
 
 export const AuthContext = createContext(null);
 const googleProvider = new GoogleAuthProvider();
@@ -55,6 +55,7 @@ const AuthProvider = ({ children }) => {
       await signOut(auth);
       console.log("User signed out successfully.");
       setUser(null);
+      localStorage.removeItem("access-token");
     } catch (error) {
       console.error("Error signing out:", error.message);
       setError("Failed to sign out. Please try again.");
@@ -75,7 +76,10 @@ const AuthProvider = ({ children }) => {
         name: result.user.displayName,
         photo: result.user.photoURL,
       };
-      await axiosPublic.post("/users", userInfo);
+      const response = await axiosPublic.post("/users", userInfo);
+
+      // Optional: Add server response handling if needed
+      console.log("Server response for Google sign-in:", response.data);
     } catch (error) {
       console.error("Error signing in with Google:", error.message);
       setError("Failed to sign in with Google.");

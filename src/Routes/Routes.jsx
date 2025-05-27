@@ -17,6 +17,7 @@ import AllRequests from "../Pages/AllRequests/AllRequests";
 import MyEmployeeList from "../Pages/MyEmployeeList/MyEmployeeList"
 import AddAnEmployee from "../Pages/AddAnEmployee/AddAnEmployee";
 import PrivateRoute from "./PrivateRoute";
+import Dashboard from "../Layout/Dashboard";
 
 export  const router = createBrowserRouter([
     {
@@ -27,40 +28,47 @@ export  const router = createBrowserRouter([
           path:"/",
           element:<Home></Home>
         },
+        
+        
+      ]
+    },{
+      path:'dashboard',
+      element:<Dashboard></Dashboard>,
+      children:[
         {
-          path:'/myAssets',
+          path:'myAssets',
           element:<PrivateRoute><MyAssets></MyAssets></PrivateRoute>
         },
         {
-          path:'/requestForAsset',
+          path:'requestForAsset',
           element:<PrivateRoute><RequestAssetPage></RequestAssetPage></PrivateRoute>
         },
         {
-          path:'/profile',
+          path:'profile',
           element:<PrivateRoute><Profile></Profile></PrivateRoute>
         },
         {
-          path:'/myTeam',
+          path:'myTeam',
           element:<PrivateRoute><MyTeamPage></MyTeamPage></PrivateRoute>
         },
         {
-          path:'/assetList',
+          path:'assetList',
           element:<PrivateRoute><AssetList></AssetList></PrivateRoute>
         },
         {
-          path:'/addAnAsset',
+          path:'addAnAsset',
           element:<PrivateRoute><AddAnAsset></AddAnAsset></PrivateRoute>
         },
         {
-          path:'/allRequests',
+          path:'allRequests',
           element:<PrivateRoute><AllRequests></AllRequests></PrivateRoute>
         },
         {
-          path:'/myEmployeeList',
+          path:'myEmployeeList',
           element:<PrivateRoute><MyEmployeeList></MyEmployeeList></PrivateRoute>
         },
         {
-          path:'/addAnEmployee',
+          path:'addAnEmployee',
           element:<PrivateRoute><AddAnEmployee></AddAnEmployee></PrivateRoute>
         }
       ]
