@@ -1,39 +1,37 @@
 import { createContext, useEffect, useState } from 'react';
-import {
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  updateProfile
-} from 'firebase/auth';
+import { GoogleAuthProvider, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
 import { auth } from '../config/firebase.config';
-import useAxiosSecure from '../hooks/useAxiosSecure';
+import useAxiosPublic from '../hooks/useAxiosPublic';
 
 export const AuthContext = createContext(null);
+
 const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const axiosSecure = useAxiosSecure();
+  const axiosPublic = useAxiosPublic();
 
-  const createUser = (email, password) => {
+  // Create user with email and password
+  const createUser = async (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
+  // Sign in with email and password
   const signIn = (email, password) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signInWithGoogle = () => {
+  // Sign in with Google
+  const googleSignIn = () => {
     setLoading(true);
     return signInWithPopup(auth, googleProvider);
   };
 
+  // Update user profile
   const updateUserProfile = (name, photo) => {
     return updateProfile(auth.currentUser, {
       displayName: name,
@@ -41,43 +39,44 @@ const AuthProvider = ({ children }) => {
     });
   };
 
-  const logout = async () => {
+  // Sign out
+  const logout = () => {
     setLoading(true);
-    try {
-      await signOut(auth);
-      localStorage.removeItem('access_token');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    return signOut(auth);
   };
 
+  // Observer for user state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, currentUser => {
       setUser(currentUser);
-      
       if (currentUser) {
-        try {
-          const { data } = await axiosSecure.post('/auth/token', {
-            email: currentUser.email
+        // Get user role from backend
+        axiosPublic.get(`/users/role/${currentUser.email}`)
+          .then(res => {
+            setRole(res.data.role);
+          })
+          .catch(error => {
+            console.error('Error fetching user role:', error);
+          })
+          .finally(() => {
+            setLoading(false);
           });
-          localStorage.setItem('access_token', data.token);
-        } catch (error) {
-          console.error('Token generation error:', error);
-        }
+      } else {
+        setRole(null);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [axiosSecure]);
+  }, [axiosPublic]);
 
   const authInfo = {
     user,
+    role,
     loading,
     createUser,
     signIn,
-    signInWithGoogle,
+    googleSignIn,
     updateUserProfile,
     logout
   };
@@ -89,4 +88,4 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthProvider;
+export default AuthProvider; 

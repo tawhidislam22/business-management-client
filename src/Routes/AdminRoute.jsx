@@ -1,12 +1,14 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import useAdmin from '../hooks/useAdmin';
 import { ThreeDots } from 'react-loader-spinner';
 
-const PrivateRoute = ({ children }) => {
+const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const { isHR, isHRLoading } = useAdmin();
   const location = useLocation();
 
-  if (loading) {
+  if (loading || isHRLoading) {
     return (
       <div className="h-screen flex justify-center items-center">
         <ThreeDots
@@ -18,13 +20,13 @@ const PrivateRoute = ({ children }) => {
         />
       </div>
     );
-    }
+  }
 
-  if (user) {
+  if (user && isHR) {
     return children;
-    }
+  }
 
-  return <Navigate to="/login" state={{ from: location }} replace />;
+  return <Navigate to="/dashboard" state={{ from: location }} replace />;
 };
 
-export default PrivateRoute;
+export default AdminRoute; 

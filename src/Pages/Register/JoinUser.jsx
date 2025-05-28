@@ -7,10 +7,11 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
 import SocialLogin from "../../Coponents/SocialLogin/SocialLogin";
 
-const JoinAsHRManager = () => {
+const JoinUser = () => {
     const { createUser, updateUserProfile } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [userRole, setUserRole] = useState('employee');
     const axiosPublic = useAxiosPublic();
     const navigate = useNavigate();
 
@@ -24,19 +25,29 @@ const JoinAsHRManager = () => {
 
     const password = watch("password");
 
+    const uploadImage = async (file) => {
+        const imageFile = new FormData();
+        imageFile.append('image', file);
+        const response = await axiosPublic.post(
+            `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`,
+            imageFile
+        );
+        return response.data.data.url;
+    };
+
     const onSubmit = async (data) => {
         setLoading(true);
         try {
-            // Upload image to imgbb if provided
+            // Upload profile image if provided
             let photoURL = null;
             if (data.photo && data.photo[0]) {
-                const imageFile = new FormData();
-                imageFile.append('image', data.photo[0]);
-                const imgbbResponse = await axiosPublic.post(
-                    `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`,
-                    imageFile
-                );
-                photoURL = imgbbResponse.data.data.url;
+                photoURL = await uploadImage(data.photo[0]);
+            }
+
+            // Upload company logo if HR and logo provided
+            let companyLogo = null;
+            if (userRole === 'hr' && data.companyLogo && data.companyLogo[0]) {
+                companyLogo = await uploadImage(data.companyLogo[0]);
             }
 
             // Create user
@@ -45,15 +56,19 @@ const JoinAsHRManager = () => {
             // Update profile
             await updateUserProfile(data.name, photoURL);
 
-            // Save user to database
+            // Prepare user info based on role
             const userInfo = {
                 name: data.name,
                 email: data.email,
-                role: 'hr',
+                role: userRole,
                 photo: photoURL,
                 dateOfJoining: new Date(),
-                companyName: data.companyName,
-                companyLogo: data.companyLogo?.[0] ? await uploadImage(data.companyLogo[0]) : null
+                ...(userRole === 'employee' ? {
+                    department: data.department
+                } : {
+                    companyName: data.companyName,
+                    companyLogo: companyLogo
+                })
             };
 
             // Save user info to database
@@ -80,21 +95,26 @@ const JoinAsHRManager = () => {
         }
     };
 
-    const uploadImage = async (file) => {
-        const imageFile = new FormData();
-        imageFile.append('image', file);
-        const response = await axiosPublic.post(
-            `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`,
-            imageFile
-        );
-        return response.data.data.url;
-    };
-
     return (
         <div className="min-h-screen bg-base-200 flex items-center justify-center py-8">
             <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-base-100">
                 <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
-                    <h1 className="text-4xl font-bold text-center mb-4">Join as HR Manager</h1>
+                    <h1 className="text-4xl font-bold text-center mb-4">Create Account</h1>
+
+                    {/* Role Selection */}
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text">Join as</span>
+                        </label>
+                        <select
+                            className="select select-bordered w-full"
+                            value={userRole}
+                            onChange={(e) => setUserRole(e.target.value)}
+                        >
+                            <option value="employee">Employee</option>
+                            <option value="hr">HR Manager</option>
+                        </select>
+                    </div>
 
                     {/* Full Name */}
                     <div className="form-control">
@@ -116,22 +136,6 @@ const JoinAsHRManager = () => {
                         {errors.name && <span className="text-red-500 text-sm mt-1">{errors.name.message}</span>}
                     </div>
 
-                    {/* Company Name */}
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Company Name</span>
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Company Name"
-                            className="input input-bordered"
-                            {...register("companyName", {
-                                required: "Company name is required"
-                            })}
-                        />
-                        {errors.companyName && <span className="text-red-500 text-sm mt-1">{errors.companyName.message}</span>}
-                    </div>
-
                     {/* Email */}
                     <div className="form-control">
                         <label className="label">
@@ -151,6 +155,62 @@ const JoinAsHRManager = () => {
                         />
                         {errors.email && <span className="text-red-500 text-sm mt-1">{errors.email.message}</span>}
                     </div>
+
+                    {/* Conditional Fields based on Role */}
+                    {userRole === 'employee' ? (
+                        // Employee-specific fields
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Department</span>
+                            </label>
+                            <select
+                                className="select select-bordered w-full"
+                                {...register("department", {
+                                    required: "Department is required"
+                                })}
+                            >
+                                <option value="">Select Department</option>
+                                <option value="engineering">Engineering</option>
+                                <option value="marketing">Marketing</option>
+                                <option value="sales">Sales</option>
+                                <option value="finance">Finance</option>
+                                <option value="hr">Human Resources</option>
+                            </select>
+                            {errors.department && <span className="text-red-500 text-sm mt-1">{errors.department.message}</span>}
+                        </div>
+                    ) : (
+                        // HR-specific fields
+                        <>
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text">Company Name</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Company Name"
+                                    className="input input-bordered"
+                                    {...register("companyName", {
+                                        required: "Company name is required"
+                                    })}
+                                />
+                                {errors.companyName && <span className="text-red-500 text-sm mt-1">{errors.companyName.message}</span>}
+                            </div>
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text">Company Logo</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    className="file-input file-input-bordered w-full"
+                                    accept="image/*"
+                                    {...register("companyLogo", {
+                                        required: "Company logo is required"
+                                    })}
+                                />
+                                {errors.companyLogo && <span className="text-red-500 text-sm mt-1">{errors.companyLogo.message}</span>}
+                            </div>
+                        </>
+                    )}
 
                     {/* Password */}
                     <div className="form-control">
@@ -215,26 +275,17 @@ const JoinAsHRManager = () => {
                         />
                     </div>
 
-                    {/* Company Logo */}
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Company Logo</span>
-                        </label>
-                        <input
-                            type="file"
-                            className="file-input file-input-bordered w-full"
-                            accept="image/*"
-                            {...register("companyLogo")}
-                        />
-                    </div>
-
                     <div className="form-control mt-6">
                         <button
                             type="submit"
                             className="btn btn-primary"
                             disabled={loading}
                         >
-                            {loading ? <span className="loading loading-spinner"></span> : "Register as HR"}
+                            {loading ? (
+                                <span className="loading loading-spinner"></span>
+                            ) : (
+                                `Register as ${userRole === 'hr' ? 'HR Manager' : 'Employee'}`
+                            )}
                         </button>
                     </div>
 
@@ -254,4 +305,4 @@ const JoinAsHRManager = () => {
     );
 };
 
-export default JoinAsHRManager;
+export default JoinUser; 

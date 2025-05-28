@@ -5,13 +5,17 @@ import { initializeApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
+if (!import.meta.env.VITE_apiKey || !import.meta.env.VITE_authDomain) {
+  throw new Error('Firebase configuration is missing. Please check your .env file.');
+}
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_apiKey,
-  authDomain: import.meta.env.VITE_authDomain,
-  projectId: import.meta.env.VITE_projectId,
-  storageBucket: import.meta.env.VITE_storageBucket,
-  messagingSenderId: import.meta.env.VITE_messagingSenderId,
-  appId: import.meta.env.VITE_appId
+  apiKey: import.meta.env.VITE_apiKey?.trim(),
+  authDomain: import.meta.env.VITE_authDomain?.trim(),
+  projectId: import.meta.env.VITE_projectId?.trim(),
+  storageBucket: import.meta.env.VITE_storageBucket?.trim(),
+  messagingSenderId: import.meta.env.VITE_messagingSenderId?.trim(),
+  appId: import.meta.env.VITE_appId?.trim()
 };
 
 // Initialize Firebase

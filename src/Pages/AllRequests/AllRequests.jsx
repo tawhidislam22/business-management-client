@@ -1,51 +1,124 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import useDebounce from "../../Hooks/useDebounce"; // Import the custom debounce hook
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useDebounce from "../../hooks/useDebounce";
+import useAuth from "../../hooks/useAuth";
+import { toast } from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const AllRequests = () => {
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
   const [requests, setRequests] = useState([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-
   const debouncedSearch = useDebounce(search, 500); // Debounce the search term by 500ms
 
   // Fetch all requests
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/allRequests", {
-        params: { search: debouncedSearch, status, email },
+      const response = await axiosSecure.get("/allRequests", {
+        params: { 
+          search: debouncedSearch, 
+          status, 
+          email,
+          hrEmail: user?.email 
+        },
       });
       setRequests(response.data);
     } catch (error) {
-      console.error("Error fetching requests:", error.message);
+      toast.error(error.response?.data?.message || "Failed to fetch requests");
+      console.error("Error fetching requests:", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  // Fetch requests on mount and when filters change
+  };  // Fetch requests on mount and when filters change
   useEffect(() => {
-    fetchRequests();
-  }, [debouncedSearch, status, email]);
+    if (user) {
+      fetchRequests();
+    }
+  }, [debouncedSearch, status, email, user]);
 
-  // Approve or Reject Request
-  const handleApprove = async (requestId) => {
+  // Approve Request
+  const handleApprove = async (requestId, assetName) => {
     try {
-      await axios.put(`http://localhost:5000/allRequests/${requestId}/approve`);
-      fetchRequests(); // Reload the requests after approving
+      // First, check if user is authenticated
+      if (!user?.email) {
+        toast.error("You must be logged in to approve requests");
+        return;
+      }
+
+      const result = await Swal.fire({
+        title: 'Confirm Approval',
+        text: `Are you sure you want to approve the request for ${assetName}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, approve it!',
+        cancelButtonText: 'Cancel',
+        showLoaderOnConfirm: true,
+        preConfirm: async () => {
+          try {
+            const response = await axiosSecure.put(`/allRequests/${requestId}/approve`, {
+              hrEmail: user.email,
+              approvalDate: new Date().toISOString()
+            });
+            return response.data;
+          } catch (error) {
+            Swal.showValidationMessage(
+              `Request failed: ${error.response?.data?.message || error.message}`
+            );
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+      });
+
+      if (result.isConfirmed) {
+        if (result.value.success) {
+          toast.success('Request approved successfully');
+          await fetchRequests();
+        } else {
+          toast.error(result.value.message || 'Failed to approve request');
+        }
+      }
     } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to approve request");
       console.error("Error approving request:", error);
     }
   };
 
+  // Reject Request
   const handleReject = async (requestId) => {
     try {
-      await axios.put(`http://localhost:5000/allRequests/${requestId}/reject`);
-      fetchRequests(); // Reload the requests after rejecting
+      const { value: rejectReason } = await Swal.fire({
+        title: 'Reject Request',
+        input: 'text',
+        inputLabel: 'Reason for rejection',
+        inputPlaceholder: 'Enter the reason for rejection',
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value) {
+            return 'Please provide a reason for rejection'
+          }
+        }
+      });
+
+      if (rejectReason) {
+        const response = await axiosSecure.put(`/allRequests/${requestId}/reject`, {
+          hrEmail: user?.email,
+          rejectReason
+        });
+        
+        if (response.data.success) {
+          toast.success('Request rejected successfully');
+          fetchRequests();
+        }
+      }
     } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to reject request");
       console.error("Error rejecting request:", error);
     }
   };
@@ -121,9 +194,8 @@ const AllRequests = () => {
                 <td className="px-4 py-2 text-gray-800 dark:text-gray-200">{request.status}</td>
                 <td className="px-4 py-2 flex gap-2">
                   {request.status === "pending" && (
-                    <>
-                      <button
-                        onClick={() => handleApprove(request._id)}
+                    <>                      <button
+                        onClick={() => handleApprove(request._id, request.name)}
                         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                       >
                         Approve
