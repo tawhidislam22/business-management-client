@@ -1,12 +1,7 @@
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import useAuth from './useAuth';
-
-const axiosSecure = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true
-});
+import axiosSecure from '../config/axios.config';
 
 const useAxiosSecure = () => {
   const { logout } = useAuth();
@@ -14,7 +9,7 @@ const useAxiosSecure = () => {
 
   useEffect(() => {
     // Request interceptor
-    axiosSecure.interceptors.request.use(
+    const requestInterceptor = axiosSecure.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('access_token');
         if (token) {
@@ -28,7 +23,7 @@ const useAxiosSecure = () => {
     );
 
     // Response interceptor
-    axiosSecure.interceptors.response.use(
+    const responseInterceptor = axiosSecure.interceptors.response.use(
       (response) => response,
       async (error) => {
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
@@ -38,6 +33,11 @@ const useAxiosSecure = () => {
         return Promise.reject(error);
       }
     );
+
+    return () => {
+      axiosSecure.interceptors.request.eject(requestInterceptor);
+      axiosSecure.interceptors.response.eject(responseInterceptor);
+    };
   }, [logout, navigate]);
 
   return axiosSecure;

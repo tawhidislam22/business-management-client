@@ -13,10 +13,10 @@ const MyAssets = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  const { data: assets = [], refetch, isLoading } = useQuery({
+  const { data: { data: assets = [] } = {}, refetch, isLoading } = useQuery({
     queryKey: ['my-assets', user?.email, searchTerm, statusFilter, typeFilter],
     queryFn: async () => {
-      if (!user?.email) return [];
+      if (!user?.email) return { data: [] };
       const params = new URLSearchParams({
         email: user.email,
         search: searchTerm,
@@ -24,7 +24,7 @@ const MyAssets = () => {
         type: typeFilter
       });
       const res = await axiosSecure.get(`/requests?${params.toString()}`);
-      return res.data;
+      return { data: Array.isArray(res.data) ? res.data : [] };
     },
     enabled: !!user?.email
   });
@@ -117,11 +117,10 @@ const MyAssets = () => {
             </tr>
           </thead>
           <tbody>
-            {assets.map((asset) => (
-              <tr key={asset._id}>
-                <td>{asset.name}</td>
-                <td>{asset.type}</td>
-                <td>{new Date(asset.requestDate).toLocaleDateString()}</td>
+            {Array.isArray(assets) && assets.map((asset) => (
+              <tr key={asset._id}>                <td>{asset?.name || 'N/A'}</td>
+                <td>{asset?.type || 'N/A'}</td>
+                <td>{asset?.requestDate ? new Date(asset.requestDate).toLocaleDateString() : 'N/A'}</td>
                 <td>
                   <span className={`badge ${
                     asset.status === 'approved' ? 'badge-success' :
@@ -130,11 +129,11 @@ const MyAssets = () => {
                     asset.status === 'cancelled' ? 'badge-neutral' :
                     'badge-warning'
                   }`}>
-                    {asset.status}
+                    {asset?.status}
                   </span>
                 </td>
                 <td>
-                  {asset.status === 'pending' && (
+                  {asset?.status === 'pending' && (
                     <button
                       onClick={() => handleCancel(asset._id)}
                       className="btn btn-error btn-sm"
@@ -142,7 +141,7 @@ const MyAssets = () => {
                       Cancel
                     </button>
                   )}
-                  {asset.status === 'approved' && (
+                  {asset?.status === 'approved' && (
                     <div className="flex gap-2">
                       <PDFDownloadLink
                         document={<AssetPDF asset={asset} />}
@@ -163,12 +162,11 @@ const MyAssets = () => {
                   )}
                 </td>
               </tr>
-            ))}
-          </tbody>
+            ))}          </tbody>
         </table>
       </div>
 
-      {assets.length === 0 && (
+      {(!Array.isArray(assets) || assets.length === 0) && (
         <div className="text-center py-8">
           <p className="text-lg text-gray-500">No assets found</p>
         </div>

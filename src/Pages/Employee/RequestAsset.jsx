@@ -15,7 +15,7 @@ const RequestAsset = () => {
 
   const { register, handleSubmit, reset } = useForm();
 
-  const { data: assets = [], refetch, isLoading } = useQuery({
+  const { data: assets = [], refetch, isLoading, error } = useQuery({
     queryKey: ['available-assets', searchTerm, typeFilter, availabilityFilter],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -24,7 +24,7 @@ const RequestAsset = () => {
         availability: availabilityFilter
       });
       const res = await axiosSecure.get(`/assets?${params.toString()}`);
-      return res.data;
+      return Array.isArray(res.data) ? res.data : [];
     }
   });
 
@@ -65,6 +65,14 @@ const RequestAsset = () => {
     const modal = document.getElementById('request-modal');
     modal.close();
   };
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <p className="text-error">Error loading assets. Please try again later.</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -198,4 +206,4 @@ const RequestAsset = () => {
   );
 };
 
-export default RequestAsset; 
+export default RequestAsset;

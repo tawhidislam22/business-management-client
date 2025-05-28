@@ -114,39 +114,39 @@ const AssetList = () => {
             </tr>
           </thead>
           <tbody>
-            {assets.map((asset) => (
+            {assets?.map((asset) => (
               <tr key={asset._id}>
                 <td>
                   <div className="flex items-center gap-2">
                     <img
-                      src={asset.image || '/default-asset.png'}
-                      alt={asset.name}
+                      src={asset?.image || '/default-asset.png'}
+                      alt={asset?.name}
                       className="w-12 h-12 rounded object-cover"
                       onError={(e) => {
                         e.target.src = '/default-asset.png';
                       }}
                     />
                     <div>
-                      <div className="font-bold">{asset.name}</div>
-                      <div className="text-sm opacity-50">{asset.description}</div>
+                      <div className="font-bold">{asset?.name}</div>
+                          <div className="text-sm opacity-50">{asset?.description}</div>
                     </div>
                   </div>
                 </td>
                 <td>
                   <span className="badge badge-outline">
-                    {asset.type}
+                    {asset?.type}
                   </span>
                 </td>
                 <td>
                   <span className={`badge ${
-                    asset.quantity > 10 ? 'badge-success' :
-                    asset.quantity > 0 ? 'badge-warning' :
+                    asset?.quantity > 10 ? 'badge-success' :
+                    asset?.quantity > 0 ? 'badge-warning' :
                     'badge-error'
                   }`}>
-                    {asset.quantity}
+                    {asset?.quantity}
                   </span>
                 </td>
-                <td>{new Date(asset.createdAt).toLocaleDateString()}</td>
+                <td>{new Date(asset?.createdAt).toLocaleDateString()}</td>
                 <td>
                   <div className="flex gap-2">
                     <button
@@ -198,7 +198,7 @@ const AssetList = () => {
         </div>
       )}
 
-      {assets.length === 0 && (
+      {assets?.length === 0 && (
         <div className="text-center py-8">
           <p className="text-lg text-gray-500">No assets found</p>
         </div>

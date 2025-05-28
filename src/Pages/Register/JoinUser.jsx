@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../../Hooks/useAuth";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
-import SocialLogin from "../../Coponents/SocialLogin/SocialLogin";
+import SocialLogin from "../../Components/SocialLogin";
+import useAuth from "../../hooks/useAuth";
 
 const JoinUser = () => {
     const { createUser, updateUserProfile } = useAuth();
@@ -298,7 +298,16 @@ const JoinUser = () => {
 
                     <div className="divider">OR</div>
 
-                    <SocialLogin />
+                    <SocialLogin 
+                        role={userRole}
+                        additionalData={userRole === 'hr' ? {
+                            company: {
+                                name: '',
+                                logo: '',
+                                package: 'free'
+                            }
+                        } : {}}
+                    />
                 </form>
             </div>
         </div>

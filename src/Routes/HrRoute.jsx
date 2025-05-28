@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
-import useAdmin from "../Hooks/useAdmin";
-import useAuth from "../Hooks/useAuth";
+import useAdmin from "../hooks/useAdmin";
+import useAuth from "../hooks/useAuth";
 
 const HrRoute = ({ children }) => {
     const [isHr, isHrLoading] = useAdmin();

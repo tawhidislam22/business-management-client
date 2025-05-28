@@ -1,23 +1,22 @@
-// Import the functions you need from the SDKs you need
-import { getAuth } from "firebase/auth";
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+
+
+// Validate environment variables
 if (!import.meta.env.VITE_apiKey || !import.meta.env.VITE_authDomain) {
   throw new Error('Firebase configuration is missing. Please check your .env file.');
 }
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_apiKey?.trim(),
-  authDomain: import.meta.env.VITE_authDomain?.trim(),
-  projectId: import.meta.env.VITE_projectId?.trim(),
-  storageBucket: import.meta.env.VITE_storageBucket?.trim(),
-  messagingSenderId: import.meta.env.VITE_messagingSenderId?.trim(),
-  appId: import.meta.env.VITE_appId?.trim()
+  apiKey: "AIzaSyB9lyIRU_ySwl3fmVjBJan1ZZB56HYpF2w",
+  authDomain: "coffee-store-client-f2742.firebaseapp.com",
+  projectId: "coffee-store-client-f2742",
+  storageBucket: "coffee-store-client-f2742.firebasestorage.app",
+  messagingSenderId: "38198709231",
+  appId: "1:38198709231:web:4a310a75ccd2a069f7841a"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth=getAuth(app)
+ const app = initializeApp(firebaseConfig);
+  const auth=getAuth(app)
+  export { app, auth };

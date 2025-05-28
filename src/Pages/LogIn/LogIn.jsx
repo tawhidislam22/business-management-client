@@ -1,143 +1,89 @@
-import { useForm } from "react-hook-form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import SocialLogin from "../../Coponents/SocialLogin/SocialLogin";
-import useAuth from "../../Hooks/useAuth";
-import loginLottie from "../../assets/Lottie-File/Login-lottie.json";
-import Lottie from "lottie-react";
-import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+import { FaGoogle } from 'react-icons/fa';
 
-const LogIn = () => {
-    const { signIn } = useAuth();
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const axiosPublic = useAxiosPublic();
+const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const { signIn, signInWithGoogle } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname || '/dashboard';
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset
-    } = useForm();
-
-    const onSubmit = async (data) => {
-        setLoading(true);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            // Sign in user
-            const result = await signIn(data.email, data.password);
-            
-            // Get JWT token
-            const response = await axiosPublic.post('/jwt', {
-                email: result.user.email
-            });
-            
-            if (response.data.token) {
-                // Save token in localStorage
-                localStorage.setItem('access-token', response.data.token);
-                
-                toast.success('Login successful!');
-                reset();
-                navigate(from, { replace: true });
-            }
+            await signIn(email, password);
+            navigate(from, { replace: true });
         } catch (error) {
-            toast.error(error.message || 'Failed to login');
             console.error('Login error:', error);
-        } finally {
-            setLoading(false);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithGoogle();
+            navigate(from, { replace: true });
+        } catch (error) {
+            console.error('Google sign-in error:', error);
         }
     };
 
     return (
-        <div className="min-h-screen bg-base-200 flex items-center justify-center">
-            <div className="hero-content flex-col lg:flex-row-reverse gap-8">
-                <div className="text-center lg:text-left max-w-md">
-                    <Lottie animationData={loginLottie} className="w-full" />
-                </div>
-                <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-                    <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
-                        <h1 className="text-4xl font-bold text-center mb-4">Login</h1>
-                        
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text">Email</span>
-                            </label>
-                            <input
-                                type="email"
-                                placeholder="email"
-                                className="input input-bordered"
-                                {...register("email", {
-                                    required: "Email is required",
-                                    pattern: {
-                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                        message: "Invalid email address"
-                                    }
-                                })}
-                            />
-                            {errors.email && <span className="text-red-500 text-sm mt-1">{errors.email.message}</span>}
-                        </div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+                <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+                
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <input
+                            type="email"
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
 
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text">Password</span>
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="password"
-                                    className="input input-bordered w-full"
-                                    {...register("password", {
-                                        required: "Password is required",
-                                        minLength: {
-                                            value: 6,
-                                            message: "Password must be at least 6 characters"
-                                        }
-                                    })}
-                                />
-                                <button
-                                    type="button"
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
-                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                </button>
-                            </div>
-                            {errors.password && <span className="text-red-500 text-sm mt-1">{errors.password.message}</span>}
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Password</label>
+                        <input
+                            type="password"
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
 
-                        <div className="form-control mt-6">
-                            <button
-                                type="submit"
-                                className="btn btn-primary"
-                                disabled={loading}
-                            >
-                                {loading ? <span className="loading loading-spinner"></span> : "Login"}
-                            </button>
-                        </div>
+                    <button
+                        type="submit"
+                        className="w-full btn btn-primary"
+                    >
+                        Login
+                    </button>
+                </form>
 
-                        <p className="text-center mt-4">
-                            Don't have an account?{" "}
-                            <Link to="/joinAsEmployee" className="text-primary hover:underline">
-                                Join as Employee
-                            </Link>
-                            {" or "}
-                            <Link to="/joinAsHr" className="text-primary hover:underline">
-                                Join as HR
-                            </Link>
-                        </p>
+                <div className="divider">OR</div>
 
-                        <div className="divider">OR</div>
+                <button
+                    onClick={handleGoogleSignIn}
+                    className="w-full btn btn-outline gap-2"
+                >
+                    <FaGoogle /> Continue with Google
+                </button>
 
-                        <SocialLogin />
-                    </form>
-                </div>
+                <p className="mt-4 text-center text-sm text-gray-600">
+                    Don't have an account?{' '}
+                    <Link to="/register" className="text-primary font-medium">
+                        Register here
+                    </Link>
+                </p>
             </div>
         </div>
     );
 };
 
-export default LogIn;
+export default Login;

@@ -1,6 +1,7 @@
+import { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
-import { ThreeDots } from 'react-loader-spinner';
+
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -8,21 +9,15 @@ const PrivateRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="h-screen flex justify-center items-center">
-        <ThreeDots
-          height="80"
-          width="80"
-          radius="9"
-          color="#4fa94d"
-          ariaLabel="loading"
-        />
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
       </div>
     );
-    }
+  }
 
   if (user) {
     return children;
-    }
+  }
 
   return <Navigate to="/login" state={{ from: location }} replace />;
 };

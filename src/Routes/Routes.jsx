@@ -1,94 +1,101 @@
 import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import Home from '../Pages/Home/Home';
-import Login from '../Pages/Auth/Login';
-import JoinAsEmployee from '../Pages/Auth/JoinAsEmployee';
-import JoinAsHR from '../Pages/Auth/JoinAsHR';
-import PrivateRoute from './PrivateRoute';
-import AdminRoute from './AdminRoute';
-import DashboardLayout from '../layouts/DashboardLayout';
-import MyAssets from '../Pages/MyAssets/MyAssets';
-import MyTeam from '../Pages/MyTeam/MyTeam';
-import RequestAsset from '../Pages/RequestForAsset/RequestAssetPage';
-import Profile from '../Pages/Profile/Profile';
-import AssetList from '../Pages/AssetList/AssetList';
-import AddAsset from '../Pages/AddAnAsset/AddAnAsset';
-import AllRequests from '../Pages/AllRequests/AllRequests';
-import EmployeeList from '../Pages/MyEmployeeList/MyEmployeeList';
-import AddEmployee from '../Pages/AddAnEmployee/AddAnEmployee';
-import Payment from '../Pages/Payment/Payment';
 import ErrorPage from '../Pages/ErrorPage';
+import Home from '../Pages/Home/Home';
+import Login from '../Pages/LogIn/LogIn';
+import JoinUser from '../Pages/Register/JoinUser';
+import JoinAsHR from '../Pages/Auth/JoinAsHR';
+import JoinAsEmployee from '../Pages/Auth/JoinAsEmployee';
+import Dashboard from '../layouts/Dashboard';
+import PrivateRoute from './PrivateRoute';
+import MyAssets from '../Pages/Employee/MyAssets';
+import RequestAsset from '../Pages/Employee/RequestAsset';
+import MyTeam from '../Pages/Employee/MyTeam';
+import AssetList from '../Pages/HR/AssetList';
+import AddAsset from '../Pages/HR/AddAsset';
+import AllRequests from '../Pages/HR/AllRequests';
+import EmployeeList from '../Pages/HR/EmployeeList';
+import Profile from '../Pages/Profile/Profile';
+import Payment from '../Pages/Payment/Payment';
+import PaymentHistory from '../Pages/PaymentHistory/PaymentHistory';
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <MainLayout />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
+    {
         path: '/',
-        element: <Home />
-      },
-      {
-        path: '/login',
-        element: <Login />
-      },
-      {
-        path: '/join-as-employee',
-        element: <JoinAsEmployee />
-      },
-      {
-        path: '/join-as-hr',
-        element: <JoinAsHR />
-      },
-      {
-        path: '/payment',
-        element: <PrivateRoute><Payment /></PrivateRoute>
-      }
-    ]
-  },
-  {
-    path: '/dashboard',
-    element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
-    children: [
-      {
-        path: 'my-assets',
-        element: <MyAssets />
-      },
-      {
-        path: 'my-team',
-        element: <MyTeam />
-      },
-      {
-        path: 'request-asset',
-        element: <RequestAsset />
-      },
-      {
-        path: 'profile',
-        element: <Profile />
-      },
-      {
-        path: 'asset-list',
-        element: <AdminRoute><AssetList /></AdminRoute>
-      },
-      {
-        path: 'add-asset',
-        element: <AdminRoute><AddAsset /></AdminRoute>
-      },
-      {
-        path: 'all-requests',
-        element: <AdminRoute><AllRequests /></AdminRoute>
-      },
-      {
-        path: 'employee-list',
-        element: <AdminRoute><EmployeeList /></AdminRoute>
-      },
-      {
-        path: 'add-employee',
-        element: <AdminRoute><AddEmployee /></AdminRoute>
-      }
-    ]
-  }
+        element: <MainLayout />,
+        errorElement: <ErrorPage />,
+        children: [
+            {
+                path: '/',
+                element: <Home />
+            },
+            {
+                path: 'login',
+                element: <Login />
+            },
+            {
+                path: 'register',
+                element: <JoinUser />
+            },
+            {
+                path: 'join-as-hr',
+                element: <JoinAsHR />
+            },
+            {
+                path: 'join-as-employee',
+                element: <JoinAsEmployee />
+            }
+        ]
+    },
+    {
+        path: '/dashboard',
+        element: <PrivateRoute><Dashboard /></PrivateRoute>,
+        children: [
+            // Employee routes
+            {
+                path: 'my-assets',
+                element: <PrivateRoute><MyAssets /></PrivateRoute>
+            },
+            {
+                path: 'request-asset',
+                element: <PrivateRoute><RequestAsset /></PrivateRoute>
+            },
+            {
+                path: 'my-team',
+                element: <PrivateRoute><MyTeam /></PrivateRoute>
+            },
+            // HR routes
+            {
+                path: 'asset-list',
+                element: <PrivateRoute><AssetList /></PrivateRoute>
+            },
+            {
+                path: 'add-asset',
+                element: <PrivateRoute><AddAsset /></PrivateRoute>
+            },
+            {
+                path: 'all-requests',
+                element: <PrivateRoute><AllRequests /></PrivateRoute>
+            },
+            {
+                path: 'employee-list',
+                element: <PrivateRoute><EmployeeList /></PrivateRoute>
+            },
+            // Common routes
+            {
+                path: 'profile',
+                element: <PrivateRoute><Profile /></PrivateRoute>
+            },
+            {
+                path: 'payment',
+                element: <PrivateRoute><Payment /></PrivateRoute>
+            },
+            {
+                path: 'payment-history',
+                element: <PrivateRoute><PaymentHistory /></PrivateRoute>
+            }
+        ]
+    }
 ]);
 
 export default router;
