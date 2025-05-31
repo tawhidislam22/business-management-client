@@ -1,29 +1,65 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+import axios from 'axios';
 
 const AddAsset = () => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/users/${user?.email}`);
+        setUserInfo(response.data);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        toast.error('Failed to fetch user information');
+      }
+    };
+    if (user?.email) {
+      fetchUserInfo();
+    }
+  }, [user]);
 
   const onSubmit = async (data) => {
+    if (!userInfo?.company.name) {
+      toast.error('Company information not found');
+      return;
+    }
+
     try {
       setIsLoading(true);
       const assetData = {
-        ...data,
+        name: data.name,
+        type: data.type,
         quantity: parseInt(data.quantity),
+        image: data.image,
+        description: data.description,
+        companyName: userInfo.company.name,
+        hrEmail: userInfo.email,
+        status: 'available',
         createdAt: new Date().toISOString()
       };
 
-      const res = await axiosSecure.post('/assets', assetData);
-      toast.success('Asset added successfully');
-      reset();
-      navigate('/dashboard/asset-list');
+      const response = await axios.post('http://localhost:5000/assets', assetData);
+      
+      if (response.data.insertedId) {
+        toast.success('Asset added successfully');
+        reset();
+        navigate('/dashboard/asset-list');
+      } else {
+        toast.error('Failed to add asset');
+      }
     } catch (error) {
+      console.error('Error adding asset:', error);
       toast.error(error.response?.data?.message || 'Failed to add asset');
     } finally {
       setIsLoading(false);
@@ -32,17 +68,17 @@ const AddAsset = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-8">Add New Asset</h2>
+      <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">Add New Asset</h2>
 
       <div className="max-w-2xl mx-auto">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Product Name</span>
+              <span className="label-text text-gray-700 dark:text-gray-300">Product Name</span>
             </label>
             <input
               type="text"
-              className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
+              className="input"
               {...register('name', {
                 required: 'Product name is required',
                 minLength: {
@@ -53,17 +89,17 @@ const AddAsset = () => {
             />
             {errors.name && (
               <label className="label">
-                <span className="label-text-alt text-error">{errors.name.message}</span>
+                <span className="text-red-500 text-sm">{errors.name.message}</span>
               </label>
             )}
           </div>
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Product Type</span>
+              <span className="label-text text-gray-700 dark:text-gray-300">Product Type</span>
             </label>
             <select
-              className={`select select-bordered w-full ${errors.type ? 'select-error' : ''}`}
+              className="input"
               {...register('type', {
                 required: 'Product type is required'
               })}
@@ -74,18 +110,18 @@ const AddAsset = () => {
             </select>
             {errors.type && (
               <label className="label">
-                <span className="label-text-alt text-error">{errors.type.message}</span>
+                <span className="text-red-500 text-sm">{errors.type.message}</span>
               </label>
             )}
           </div>
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Quantity</span>
+              <span className="label-text text-gray-700 dark:text-gray-300">Quantity</span>
             </label>
             <input
               type="number"
-              className={`input input-bordered w-full ${errors.quantity ? 'input-error' : ''}`}
+              className="input"
               {...register('quantity', {
                 required: 'Quantity is required',
                 min: {
@@ -96,18 +132,18 @@ const AddAsset = () => {
             />
             {errors.quantity && (
               <label className="label">
-                <span className="label-text-alt text-error">{errors.quantity.message}</span>
+                <span className="text-red-500 text-sm">{errors.quantity.message}</span>
               </label>
             )}
           </div>
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Product Image URL</span>
+              <span className="label-text text-gray-700 dark:text-gray-300">Product Image URL</span>
             </label>
             <input
               type="url"
-              className={`input input-bordered w-full ${errors.image ? 'input-error' : ''}`}
+              className="input"
               {...register('image', {
                 required: 'Product image URL is required',
                 pattern: {
@@ -118,17 +154,17 @@ const AddAsset = () => {
             />
             {errors.image && (
               <label className="label">
-                <span className="label-text-alt text-error">{errors.image.message}</span>
+                <span className="text-red-500 text-sm">{errors.image.message}</span>
               </label>
             )}
           </div>
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Description</span>
+              <span className="label-text text-gray-700 dark:text-gray-300">Description</span>
             </label>
             <textarea
-              className={`textarea textarea-bordered h-24 ${errors.description ? 'textarea-error' : ''}`}
+              className="input min-h-[100px]"
               {...register('description', {
                 required: 'Description is required',
                 minLength: {
@@ -139,7 +175,7 @@ const AddAsset = () => {
             />
             {errors.description && (
               <label className="label">
-                <span className="label-text-alt text-error">{errors.description.message}</span>
+                <span className="text-red-500 text-sm">{errors.description.message}</span>
               </label>
             )}
           </div>
@@ -147,7 +183,7 @@ const AddAsset = () => {
           <div className="form-control mt-6">
             <button
               type="submit"
-              className={`btn btn-primary ${isLoading ? 'loading' : ''}`}
+              className={`btn-primary w-full ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
               disabled={isLoading}
             >
               {isLoading ? 'Adding Asset...' : 'Add Asset'}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import AssetDetailsPDF from "./AssetDetailsPDF";
-import useAuth from "../../Hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast"; // Import toast
 
 const MyAssets = () => {
@@ -16,7 +16,7 @@ const MyAssets = () => {
     queryKey: ["myAssets", search, filterStatus, filterType],
     queryFn: async () => {
       const response = await fetch(
-        `http://localhost:5000/allRequests/${user.email}?search=${search}&status=${filterStatus}&type=${filterType}`
+        `http://localhost:5000/requests/${user.email}?search=${search}&status=${filterStatus}&type=${filterType}`
       );
       if (!response.ok) throw new Error("Failed to fetch assets");
       return response.json();
@@ -26,7 +26,7 @@ const MyAssets = () => {
   const handleCancelRequest = async (assetId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/allRequests/${user.email}/${assetId}`,
+        `http://localhost:5000/requests/${user.email}/${assetId}`,
         {
           method: "DELETE",
         }
@@ -44,7 +44,7 @@ const MyAssets = () => {
   const handleReturnAsset = async (assetId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/allRequests/${user.email}/${assetId}/return`,
+        `http://localhost:5000/requests/${user.email}/${assetId}/return`,
         {
           method: "PUT",
         }

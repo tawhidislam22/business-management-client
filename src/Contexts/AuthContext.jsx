@@ -2,14 +2,17 @@ import { createContext, useEffect, useState } from 'react';
 import { GoogleAuthProvider, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
 import { auth } from '../config/firebase.config';
 import axiosSecure from '../config/axios.config';
+import axios from 'axios';
+import { getAuth } from 'firebase/auth';
 
 export const AuthContext = createContext(null);
 
 const googleProvider = new GoogleAuthProvider();
 
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const auth = getAuth();
 
   const createUser = (email, password) => {
     setLoading(true);
@@ -45,24 +48,27 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      
       if (currentUser) {
         try {
-          const { data } = await axiosSecure.post('/auth/token', {
-            email: currentUser.email
+          // Get user role from backend
+          const { data } = await axios.get(`http://localhost:5000/users/role/${currentUser.email}`);
+          
+          setUser({
+            ...currentUser,
+            role: data.role || 'employee'
           });
-          localStorage.setItem('access_token', data.token);
         } catch (error) {
-          console.error('Token generation error:', error);
+          console.error('Error fetching user role:', error);
+          setUser(currentUser);
         }
+      } else {
+        setUser(null);
       }
-
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
 
   const authInfo = {
     user,
@@ -71,7 +77,8 @@ const AuthProvider = ({ children }) => {
     signIn,
     signInWithGoogle,
     updateUserProfile,
-    logout
+    logout,
+    setUser
   };
 
   return (

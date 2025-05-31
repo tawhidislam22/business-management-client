@@ -4,22 +4,22 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
     const [isDarkMode, setIsDarkMode] = useState(
-        localStorage.getItem('theme') === 'dark'
+        localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
     );
 
     useEffect(() => {
-        const html = document.querySelector('html');
         if (isDarkMode) {
-            html.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark');
             localStorage.setItem('theme', 'dark');
         } else {
-            html.setAttribute('data-theme', 'light');
+            document.documentElement.classList.remove('dark');
             localStorage.setItem('theme', 'light');
         }
     }, [isDarkMode]);
 
     const toggleTheme = () => {
-        setIsDarkMode(!isDarkMode);
+        setIsDarkMode(prev => !prev);
     };
 
     return (

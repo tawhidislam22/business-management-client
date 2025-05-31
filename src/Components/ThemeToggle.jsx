@@ -1,5 +1,5 @@
-import { FaMoon, FaSun } from 'react-icons/fa';
-import { useTheme } from '../Contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 const ThemeToggle = () => {
     const { isDarkMode, toggleTheme } = useTheme();
@@ -7,13 +7,14 @@ const ThemeToggle = () => {
     return (
         <button
             onClick={toggleTheme}
-            className="btn btn-circle btn-ghost swap swap-rotate"
-            aria-label="Toggle theme"
+            className="relative inline-flex items-center p-2 rounded-lg transition-colors duration-300
+                     dark:bg-gray-700 bg-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600"
+            aria-label="Toggle Theme"
         >
             {isDarkMode ? (
-                <FaMoon className="text-xl text-yellow-400 swap-on" />
+                <FaMoon className="w-5 h-5 text-indigo-500 transition-transform duration-300 transform rotate-0" />
             ) : (
-                <FaSun className="text-xl text-yellow-400 swap-off" />
+                <FaSun className="w-5 h-5 text-yellow-500 transition-transform duration-300 transform rotate-0" />
             )}
         </button>
     );

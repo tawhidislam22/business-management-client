@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import { toast } from 'react-hot-toast';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-
+import useAuth from '../../hooks/useAuth';
 const AssetList = () => {
   const axiosSecure = useAxiosSecure();
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,6 +12,7 @@ const AssetList = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  const { user } = useAuth();
 
   const { data: { assets = [], totalAssets = 0 } = {}, refetch, isLoading } = useQuery({
     queryKey: ['assets', searchTerm, stockFilter, typeFilter, sortOrder, page],
@@ -24,7 +25,7 @@ const AssetList = () => {
         page,
         limit: itemsPerPage
       });
-      const res = await axiosSecure.get(`/assets?${params.toString()}`);
+      const res = await axiosSecure.get(`/assets/${user?.email}?${params.toString()}`);
       return res.data;
     }
   });

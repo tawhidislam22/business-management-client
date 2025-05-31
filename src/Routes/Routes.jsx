@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import ErrorPage from '../Pages/ErrorPage';
-import Home from '../Pages/Home/Home';
+import Home from '../pages/Home/Home';
 import Login from '../Pages/LogIn/LogIn';
 import JoinUser from '../Pages/Register/JoinUser';
 import JoinAsHR from '../Pages/Auth/JoinAsHR';
@@ -18,6 +18,7 @@ import EmployeeList from '../Pages/HR/EmployeeList';
 import Profile from '../Pages/Profile/Profile';
 import Payment from '../Pages/Payment/Payment';
 import PaymentHistory from '../Pages/PaymentHistory/PaymentHistory';
+import AllAssets from '../Pages/AllAssets';
 
 const router = createBrowserRouter([
     {
@@ -44,6 +45,14 @@ const router = createBrowserRouter([
             {
                 path: 'join-as-employee',
                 element: <JoinAsEmployee />
+            },
+            {
+                path: 'all-assets',
+                element: (
+                    <PrivateRoute>
+                        <AllAssets />
+                    </PrivateRoute>
+                )
             }
         ]
     },
@@ -64,6 +73,10 @@ const router = createBrowserRouter([
                 path: 'my-team',
                 element: <PrivateRoute><MyTeam /></PrivateRoute>
             },
+            {
+                path: 'all-assets',
+                element: <PrivateRoute><AllAssets /></PrivateRoute>
+            },  
             // HR routes
             {
                 path: 'asset-list',

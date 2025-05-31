@@ -26,18 +26,37 @@ const JoinUser = () => {
     const password = watch("password");
 
     const uploadImage = async (file) => {
-        const imageFile = new FormData();
-        imageFile.append('image', file);
-        const response = await axiosPublic.post(
-            `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`,
-            imageFile
-        );
-        return response.data.data.url;
+        try {
+            const imageFile = new FormData();
+            imageFile.append('image', file);
+            const response = await axiosPublic.post(
+                `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`,
+                imageFile
+            );
+            return response.data.data.url;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw new Error('Failed to upload image');
+        }
     };
 
     const onSubmit = async (data) => {
         setLoading(true);
         try {
+            // Validate company-related fields for HR
+            if (userRole === 'hr') {
+                if (!data.companyName) {
+                    toast.error('Company name is required for HR registration');
+                    setLoading(false);
+                    return;
+                }
+                if (!data.companyLogo || !data.companyLogo[0]) {
+                    toast.error('Company logo is required for HR registration');
+                    setLoading(false);
+                    return;
+                }
+            }
+
             // Upload profile image if provided
             let photoURL = null;
             if (data.photo && data.photo[0]) {
@@ -67,7 +86,13 @@ const JoinUser = () => {
                     department: data.department
                 } : {
                     companyName: data.companyName,
-                    companyLogo: companyLogo
+                    companyLogo: companyLogo,
+                    package: 'free',
+                    company: {
+                        name: data.companyName,
+                        logo: companyLogo,
+                        package: 'free'
+                    }
                 })
             };
 
@@ -105,11 +130,20 @@ const JoinUser = () => {
                     <div className="form-control">
                         <label className="label">
                             <span className="label-text">Join as</span>
-                        </label>
-                        <select
+                        </label>                        <select
                             className="select select-bordered w-full"
-                            value={userRole}
-                            onChange={(e) => setUserRole(e.target.value)}
+                            value={userRole}                            onChange={(e) => {
+                                const newRole = e.target.value;
+                                setUserRole(newRole);
+                                // Reset role-specific fields but keep common fields
+                                const commonFields = {
+                                    name: watch('name'),
+                                    email: watch('email'),
+                                    password: watch('password'),
+                                    confirmPassword: watch('confirmPassword')
+                                };
+                                reset(commonFields);
+                            }}
                         >
                             <option value="employee">Employee</option>
                             <option value="hr">HR Manager</option>
@@ -202,9 +236,8 @@ const JoinUser = () => {
                                 <input
                                     type="file"
                                     className="file-input file-input-bordered w-full"
-                                    accept="image/*"
-                                    {...register("companyLogo", {
-                                        required: "Company logo is required"
+                                    accept="image/*"                                {...register("companyLogo", {
+                                        required: userRole === 'hr' ? "Company logo is required" : false
                                     })}
                                 />
                                 {errors.companyLogo && <span className="text-red-500 text-sm mt-1">{errors.companyLogo.message}</span>}
@@ -314,4 +347,4 @@ const JoinUser = () => {
     );
 };
 
-export default JoinUser; 
+export default JoinUser;

@@ -1,72 +1,84 @@
 import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import ThemeToggle from '../ThemeToggle';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
 
   return (
-    <div className="navbar bg-base-100 shadow-md">
-      <div className="navbar-start">
-        <div className="dropdown">
-          <label tabIndex={0} className="btn btn-ghost lg:hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
-            </svg>
-          </label>
-          <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-            {renderMenuItems()}
-          </ul>
-        </div>
-        <Link to="/" className="flex items-center">
-          <img src="/xyz-logo.png" alt="XYZ Company" className="h-10" />
-          <span className="text-xl font-bold ml-2">XYZ</span>
-        </Link>
-      </div>
-      <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
-          {renderMenuItems()}
-        </ul>
-      </div>
-      <div className="navbar-end">
-        {user ? (
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard" className="btn btn-ghost">Dashboard</Link>
-            <div className="dropdown dropdown-end">
-              <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                <div className="w-10 rounded-full">
-                  <img src={user.photoURL || '/default-avatar.png'} alt={user.displayName} />
-                </div>
-              </label>
-              <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                <li>
-                  <Link to="/dashboard/profile" className="justify-between">
-                    Profile
-                  </Link>
-                </li>
-                <li><button onClick={logout}>Logout</button></li>
-              </ul>
-            </div>
+    <nav className="bg-white dark:bg-gray-800 shadow-md">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo and Brand */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <img src="/xyz-logo.png" alt="XYZ Company" className="h-8 w-auto" />
+              <span className="text-xl font-bold ml-2 text-primary-600 dark:text-primary-400">XYZ</span>
+            </Link>
           </div>
-        ) : (
-          <Link to="/login" className="btn btn-primary">Login</Link>
-        )}
-      </div>
-    </div>
-  );
 
-  function renderMenuItems() {
-    return (
-      <>
-        <li><Link to="/">Home</Link></li>
-        {!user && (
-          <>
-            <li><Link to="/join-as-employee">Join as Employee</Link></li>
-            <li><Link to="/join-as-hr">Join as HR</Link></li>
-          </>
-        )}
-      </>
-    );
-  }
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/" className="nav-link">Home</Link>
+            {!user && (
+              <>
+                <Link to="/join-as-employee" className="nav-link">Join as Employee</Link>
+                <Link to="/join-as-hr" className="nav-link">Join as HR</Link>
+              </>
+            )}
+          </div>
+
+          {/* Right side items */}
+          <div className="flex items-center space-x-4">
+            <ThemeToggle />
+            
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <Link to="/dashboard" className="nav-link">Dashboard</Link>
+                <div className="relative group">
+                  <button className="flex items-center">
+                    <div className="w-8 h-8 rounded-full overflow-hidden">
+                      <img 
+                        src={user.photoURL || '/default-avatar.png'} 
+                        alt={user.displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </button>
+                  <div className="absolute right-0 mt-2 w-48 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                    <Link to="/dashboard/profile" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      Profile
+                    </Link>
+                    <button 
+                      onClick={logout}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" className="btn-primary">Login</Link>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link to="/" className="nav-link block">Home</Link>
+            {!user && (
+              <>
+                <Link to="/join-as-employee" className="nav-link block">Join as Employee</Link>
+                <Link to="/join-as-hr" className="nav-link block">Join as HR</Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
 };
 
 export default Navbar; 

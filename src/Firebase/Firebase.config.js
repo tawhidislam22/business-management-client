@@ -9,12 +9,12 @@ if (!import.meta.env.VITE_apiKey || !import.meta.env.VITE_authDomain) {
 }
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB9lyIRU_ySwl3fmVjBJan1ZZB56HYpF2w",
-  authDomain: "coffee-store-client-f2742.firebaseapp.com",
-  projectId: "coffee-store-client-f2742",
-  storageBucket: "coffee-store-client-f2742.firebasestorage.app",
-  messagingSenderId: "38198709231",
-  appId: "1:38198709231:web:4a310a75ccd2a069f7841a"
+  apiKey: "AIzaSyBATIRLgRG1sD8VwrifGmO9R6cPcwU0SWg",
+  authDomain: "business-management-f433c.firebaseapp.com",
+  projectId: "business-management-f433c",
+  storageBucket: "business-management-f433c.firebasestorage.app",
+  messagingSenderId: "444044426536",
+  appId: "1:444044426536:web:379c4e42f1be6668e2e41d"
 };
 
  const app = initializeApp(firebaseConfig);
