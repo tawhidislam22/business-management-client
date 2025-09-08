@@ -46,9 +46,12 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       await signOut(auth);
-      localStorage.removeItem('access_token');
+      // Call server to clear cookie
+      await axiosPublic.post('/logout');
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,12 +61,19 @@ const AuthProvider = ({ children }) => {
       
       if (currentUser) {
         try {
-          const { data } = await axiosPublic.post('/auth/token', {
+          // Send user email to get JWT token stored in cookie
+          await axiosPublic.post('/jwt', {
             email: currentUser.email
           });
-          localStorage.setItem('access_token', data.token);
         } catch (error) {
           console.error('Token generation error:', error);
+        }
+      } else {
+        // Clear token cookie when user logs out
+        try {
+          await axiosPublic.post('/logout');
+        } catch (error) {
+          console.error('Logout error:', error);
         }
       }
 

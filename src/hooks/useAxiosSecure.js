@@ -8,13 +8,10 @@ const useAxiosSecure = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Request interceptor
+    // Request interceptor - cookies are handled automatically
     const requestInterceptor = axiosSecure.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('access_token');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
+        // Cookies are automatically sent with requests when withCredentials is true
         return config;
       },
       (error) => {
